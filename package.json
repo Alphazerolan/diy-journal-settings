@@ -22,7 +22,8 @@
     "install.py",
     "README.md",
     "README.zh.md",
-    "NOTICE"
+    "NOTICE",
+    "LICENSE"
   ],
   "license": "MIT",
   "dsh": {

@@ -68,7 +68,7 @@ def save_choices(values, apply=True):
     if apply:
         try:build.install()
         except Exception as e:
-            return {'ok':False,'saved':True,'message':'样式已保存并生成，但安装失败。请运行更新图片并预览.cmd 重试。'+str(e)}
+            return {'ok':False,'saved':True,'message':'样式已保存并生成，但应用失败。请检查皮肤目录权限，然后重新点击保存并应用。'+str(e)}
     return {'ok':True,'message':'已保存并应用到 DIY手账本。请刷新 Harness 或重新选择该皮肤。' if apply else '样式已保存并生成。'}
 
 def main():
