@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="286" viewBox="0 0 560 286"><defs>
+ <filter id="shadow" x="-15%" y="-15%" width="140%" height="150%"><feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#284b62" flood-opacity=".18" /></filter>
+ <pattern id="tape" width="10" height="10" patternUnits="userSpaceOnUse"><rect width="10" height="10" fill="#d2edf4" fill-opacity=".94" /><path d="M0 2.5h10M2.5 0v10" stroke="#6db4d2" stroke-width="5" opacity=".5" /></pattern>
+</defs>
+<g transform="rotate(-3 209 141)" filter="url(#shadow)">
+ <path d="M7 30L409 28 411 270 8 270Z" fill="#fffefa" stroke="#d9d4c4" />
+ <image x="18" y="41" width="381" height="206.4108" preserveAspectRatio="xMidYMid meet" href="{{IMAGE}}" />
+ <path d="M13 24l91-7 2 20-91 8Z" fill="url(#tape)" transform="rotate(-12 52 30)" />
+ <path d="M336 251l75-4 2 18-77 6Z" fill="url(#tape)" transform="rotate(-9 377 260)" />
+</g>
+</svg>

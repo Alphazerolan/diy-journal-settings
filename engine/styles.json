@@ -1,0 +1,66 @@
+[
+  {
+    "id": 10,
+    "name": "透明贴纸",
+    "description": "设置左栏专用，保留图片透明背景，不添加照片白边或胶带；位置、角度和大小可调。",
+    "template": null
+  },
+  {
+    "id": 0,
+    "name": "不设置照片",
+    "description": "隐藏该区域照片、白边和胶带，不占位；保留文件夹中的图片。",
+    "template": null
+  },
+  {
+    "id": 1,
+    "name": "单胶带贴照",
+    "description": "一张照片，上沿一条胶带；位置、角度与大小可调。",
+    "template": null
+  },
+  {
+    "id": 3,
+    "name": "双角胶带贴照",
+    "description": "一张照片，两角各一条胶带；位置、角度与大小可调。",
+    "template": "templates/general.svg"
+  },
+  {
+    "id": 4,
+    "name": "靠左竖照",
+    "description": "保留已保存的旧版摆放。新配置请使用基础结构，并调整位置、角度与缩放。",
+    "template": "templates/models.svg",
+    "retired": true
+  },
+  {
+    "id": 5,
+    "name": "靠右竖照",
+    "description": "保留已保存的旧版摆放。新配置请使用基础结构，并调整位置、角度与缩放。",
+    "template": "templates/presets.svg",
+    "retired": true
+  },
+  {
+    "id": 6,
+    "name": "衬纸贴照",
+    "description": "格纹衬纸托住照片，左上方一条胶带。",
+    "template": "templates/plugins.svg"
+  },
+  {
+    "id": 7,
+    "name": "宽白边贴照",
+    "description": "保留已保存的旧版摆放。新配置请使用基础结构，并调整位置、角度与缩放。",
+    "template": "templates/web.svg",
+    "retired": true
+  },
+  {
+    "id": 8,
+    "name": "双照片拼贴",
+    "description": "可分别选择两张照片；文件夹模式按文件名读取前两张，可调换顺序。只有一张时重复使用。",
+    "template": "templates/usage.svg"
+  },
+  {
+    "id": 9,
+    "name": "宽幅横照",
+    "description": "保留已保存的旧版摆放。新配置请使用基础结构，并调整位置、角度与缩放。",
+    "template": "templates/archive.svg",
+    "retired": true
+  }
+]

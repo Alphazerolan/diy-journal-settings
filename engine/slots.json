@@ -1,0 +1,128 @@
+[
+  {
+    "id": "home",
+    "folder": "主界面",
+    "navIndex": null,
+    "width": 1210,
+    "height": 756,
+    "maxWidth": 560,
+    "template": "templates/home.svg"
+  },
+  {
+    "id": "account",
+    "folder": "设置-账号与余额",
+    "navIndex": 1,
+    "width": 560.0,
+    "height": 286.0,
+    "maxWidth": 460,
+    "template": "templates/account.svg"
+  },
+  {
+    "id": "general",
+    "folder": "设置-通用设置",
+    "navIndex": 2,
+    "width": 560.0,
+    "height": 340.0,
+    "maxWidth": 560,
+    "template": "templates/general.svg"
+  },
+  {
+    "id": "models",
+    "folder": "设置-模型",
+    "navIndex": 3,
+    "width": 560.0,
+    "height": 400.0,
+    "maxWidth": 560,
+    "template": "templates/models.svg"
+  },
+  {
+    "id": "plugins",
+    "folder": "设置-内置插件",
+    "navIndex": 4,
+    "width": 560.0,
+    "height": 360.0,
+    "maxWidth": 560,
+    "template": "templates/plugins.svg"
+  },
+  {
+    "id": "presets",
+    "folder": "设置-Agent预设",
+    "navIndex": 5,
+    "width": 560.0,
+    "height": 410.0,
+    "maxWidth": 560,
+    "template": "templates/presets.svg"
+  },
+  {
+    "id": "archive",
+    "folder": "设置-已归档会话",
+    "navIndex": 6,
+    "width": 600.0,
+    "height": 435.0,
+    "maxWidth": 560,
+    "template": "templates/archive.svg"
+  },
+  {
+    "id": "web",
+    "folder": "设置-Web插件",
+    "navIndex": 7,
+    "width": 560.0,
+    "height": 455.0,
+    "maxWidth": 560,
+    "template": "templates/web.svg"
+  },
+  {
+    "id": "skins",
+    "folder": "设置-皮肤",
+    "navIndex": 8,
+    "width": 560.0,
+    "height": 286.0,
+    "maxWidth": 460,
+    "template": "templates/skins.svg"
+  },
+  {
+    "id": "pets",
+    "folder": "设置-宠物",
+    "navIndex": 9,
+    "width": 560.0,
+    "height": 315.0,
+    "maxWidth": 560,
+    "template": "templates/pets.svg"
+  },
+  {
+    "id": "workshop",
+    "folder": "设置-创意工坊",
+    "navIndex": 10,
+    "width": 560.0,
+    "height": 286.0,
+    "maxWidth": 460,
+    "template": "templates/workshop.svg"
+  },
+  {
+    "id": "usage",
+    "folder": "设置-使用统计",
+    "navIndex": 11,
+    "width": 560.0,
+    "height": 360.0,
+    "maxWidth": 460,
+    "template": "templates/usage.svg"
+  },
+  {
+    "id": "settings-sidebar",
+    "folder": "设置界面左栏",
+    "navIndex": null,
+    "width": 230,
+    "height": 260,
+    "maxWidth": 560,
+    "template": "templates/settings-sidebar.svg"
+  },
+  {
+    "id": "main-sidebar",
+    "folder": "主界面左栏",
+    "navIndex": null,
+    "width": 280.0,
+    "height": 180.0,
+    "maxWidth": 560,
+    "template": "templates/main-sidebar.svg"
+  }
+]

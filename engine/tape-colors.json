@@ -1,0 +1,9 @@
+[
+  {"id":"blue","name":"天空蓝","base":"#d2edf4","ink":"#6db4d2"},
+  {"id":"green","name":"薄荷绿","base":"#e2edcf","ink":"#92b48c"},
+  {"id":"navy","name":"深海蓝","base":"#667d9c","ink":"#d4deed"},
+  {"id":"red","name":"蜜桃粉","base":"#f9ddd4","ink":"#cb8b80"},
+  {"id":"orange","name":"杏橙色","base":"#ffe3b8","ink":"#e5a15a"},
+  {"id":"yellow","name":"奶油黄","base":"#fff0b9","ink":"#d6bb62"},
+  {"id":"purple","name":"薰衣草紫","base":"#e7def5","ink":"#ab94ce"}
+]
