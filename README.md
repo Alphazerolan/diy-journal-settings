@@ -22,6 +22,10 @@ so no developer-machine path is shipped.
 
 ## Data and updates
 
+Version 1.0.1 supports skin 1.14.2's WOFF2 fonts and embedded WebP images while
+retaining compatibility with older TTF releases. After updating the skin, update
+this plugin and rerun its installer to align the editor's font paths.
+
 The first install creates `$DSH_HOME/diy-journal-editor`, initializes layouts and
 extracts the skin's bundled generated images into that workspace. User photos,
 layouts and explicit empty selections survive subsequent installer runs. Upgrade

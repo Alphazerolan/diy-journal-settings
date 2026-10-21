@@ -6,6 +6,28 @@ spec=importlib.util.spec_from_file_location('installer',ROOT/'install.py')
 installer=importlib.util.module_from_spec(spec);spec.loader.exec_module(installer)
 
 class InstallTests(unittest.TestCase):
+    def test_compact_skin_font_format_and_webp_photo(self):
+        original=installer.ROOT
+        with tempfile.TemporaryDirectory() as temp:
+            import shutil
+            base=Path(temp);plugin=base/'plugin';plugin.mkdir()
+            shutil.copytree(ROOT/'engine',plugin/'engine');installer.ROOT=plugin
+            skin=base/'home/skins/diy-journal';art=skin/'assets/diy-generated';art.mkdir(parents=True)
+            (skin/'skin.json').write_text('{"id":"diy-journal"}')
+            uri=base64.b64encode(b'webp-extraction-fixture').decode()
+            (art/'home.svg').write_text('<svg xmlns="http://www.w3.org/2000/svg"><image href="data:image/webp;base64,'+uri+'"/></svg>')
+            try:
+                work=installer.prepare(base/'home')
+                self.assertIn('LXGWWenKai-Medium.ttf', (work/'templates/base.css').read_text(encoding='utf-8'))
+                for stem in ('LXGWWenKai-Medium','LongCang-Regular-v215'):
+                    (skin/'assets'/f'{stem}.woff2').write_bytes(b'font-format-fixture')
+                work=installer.prepare(base/'home')
+                css=(work/'templates/base.css').read_text(encoding='utf-8')
+                self.assertNotIn('format("truetype")',css)
+                self.assertIn('LXGWWenKai-Medium.woff2',css)
+                self.assertEqual((work/'DIY图片/主界面/bundled-1.webp').read_bytes(),b'webp-extraction-fixture')
+            finally:installer.ROOT=original
+
     def test_install_upgrade_uninstall_preserves_user_data(self):
         original=installer.ROOT
         with tempfile.TemporaryDirectory() as temp:

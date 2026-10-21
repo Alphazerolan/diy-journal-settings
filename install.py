@@ -26,6 +26,15 @@ def prepare(home):
             # Existing photos and layout choices survive plugin upgrades.
             if dest.exists() and (rel.parts[0]=='DIY图片' or (folder==skin and rel.parts[0]=='assets')):continue
             dest.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(p,dest)
+    # Match the installed skin's font format, including compact releases.
+    base_css=work/'templates/base.css'
+    if base_css.is_file():
+        text=base_css.read_text(encoding='utf-8')
+        for stem in ('LXGWWenKai-Medium','LongCang-Regular-v215'):
+            if (work/'assets'/f'{stem}.woff2').is_file():
+                text=text.replace(f'url(assets/{stem}.ttf) format("truetype")',
+                                  f'url(assets/{stem}.woff2) format("woff2")')
+        write(base_css,text)
     for slot in json.loads((work/'slots.json').read_text(encoding='utf-8')):
         folder=work/'DIY图片'/slot['folder'];marker=folder/'.initialized'
         if marker.exists():continue

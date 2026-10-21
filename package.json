@@ -1,6 +1,6 @@
 {
   "name": "@alphazerolan/dsh-plugin-diy-journal",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Local DIY Journal photo and layout editor for DeepSeek Harness",
   "type": "module",
   "main": "index.mjs",
