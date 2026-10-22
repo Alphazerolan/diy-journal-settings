@@ -11,7 +11,7 @@ skin 1.14.3 and its style menu** in one installation. Use **Settings > DIY Journ
 to apply it, adjust layouts and styles in each area, replace images, and combine
 tape, photo borders and captions to make the journal your own.
 
-[Download plugin 1.1.1](https://github.com/Alphazerolan/diy-journal-settings/releases/tag/v1.1.1) ·
+[Download plugin 1.1.2](https://github.com/Alphazerolan/diy-journal-settings/releases/tag/v1.1.2) ·
 [Standalone skin and component gallery](https://github.com/Alphazerolan/diy-journal-skin) ·
 [Changelog](CHANGELOG.md)
 
@@ -26,6 +26,22 @@ remains available for users who only need its appearance.
 - **Per-area collages:** choose photos and layouts for the home screen, sidebars and settings pages; adjust position, rotation, scale, tape colors/patterns, narrow/wide borders and captions.
 - **Two-photo and no-photo layouts:** swap photo order and overlap; choosing no photo collapses the photo area without leaving an empty placeholder.
 - **Scene previews:** preview the corresponding home or settings area in the menu, then save and refresh DSH to apply. Personal photos stay local.
+
+## Style menu
+
+Open the editor from **Settings > DIY Journal**.
+
+![DIY Journal entry in DSH Settings](docs/images/diy-settings-entry.png)
+
+- **Open folder:** opens the current area's photo directory without changing the selection. Use Choose image to select files added there.
+- **Restore current skin photos:** reads the photos currently used in the installed DIY Journal skin for this area and restores them into the editor preview.
+- **Restore Whale-chan presets:** restores the bundled illustrations shown in the gallery for this area.
+
+Both restore actions affect the current area only, retaining existing photo files and layout settings. If No photo is selected, restoring an image enables the single-tape layout so it is visible. **The skin changes only after Save and apply**; refresh DSH afterwards.
+
+The screenshot below shows the running updated editor. The skin scene at its bottom uses static sample content.
+
+![Style menu with image selection, folder access, both restore actions and scene preview](docs/images/diy-style-menu.png)
 
 ## Preview
 
@@ -71,7 +87,7 @@ User messages use blue grid-paper notes. DeepSeek replies use lined paper with a
 Download the `.tgz` from the link above and install it with the standard plugin manager:
 
 ```powershell
-dsh plugin --profile desktop add "C:/Downloads/alphazerolan-dsh-plugin-diy-journal-1.1.1.tgz"
+dsh plugin --profile desktop add "C:/Downloads/alphazerolan-dsh-plugin-diy-journal-1.1.2.tgz"
 ```
 
 Use `web` instead of `desktop` for Web profiles. Fully restart that DSH instance.
@@ -121,7 +137,7 @@ This is an unofficial fan work; character redistribution permission has not been
 ```sh
 npm run build
 npm test
-python tests/test_install.py
+npm run test:python
 npm pack
 ```
 

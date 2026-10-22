@@ -2,7 +2,7 @@ const token=location.hash.slice(1)||sessionStorage.getItem('diy-style-token')||'
 const state={regions:[],styles:[],colors:[],patterns:[],choices:{},saved:{},active:null,epoch:0,urls:[],busy:false,closed:false,loaded:false};
 sessionStorage.setItem('diy-style-token',token);history.replaceState(null,'',location.pathname);
 const $=id=>document.getElementById(id),clone=x=>JSON.parse(JSON.stringify(x));
-async function api(path,body){const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),['/api/save','/api/photo'].includes(path)?60000:12000);try{const r=await fetch(path,{method:body===undefined?'GET':'POST',signal:controller.signal,headers:{'X-DIY-Token':token,...(body===undefined?{}:{'Content-Type':'application/json'})},body:body===undefined?undefined:JSON.stringify(body)});if(!r.ok){let e=await r.json();throw Error(e.message)}return r;}catch(e){if(e.name==='AbortError'||e instanceof TypeError){$('retry').hidden=false;throw Error('本地菜单服务未连接。请先点击“重新连接”；仍失败时，请在 DSH 设置 → DIY 手账本中重新打开样式菜单。')}throw e}finally{clearTimeout(timer)}}
+async function api(path,body){const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),['/api/save','/api/photo','/api/restore-photo'].includes(path)?60000:12000);try{const r=await fetch(path,{method:body===undefined?'GET':'POST',signal:controller.signal,headers:{'X-DIY-Token':token,...(body===undefined?{}:{'Content-Type':'application/json'})},body:body===undefined?undefined:JSON.stringify(body)});if(!r.ok){let e=await r.json();throw Error(e.message)}return r;}catch(e){if(e.name==='AbortError'||e instanceof TypeError){$('retry').hidden=false;throw Error('本地菜单服务未连接。请先点击“重新连接”；仍失败时，请在 DSH 设置 → DIY 手账本中重新打开样式菜单。')}throw e}finally{clearTimeout(timer)}}
 function status(message,error=false){$('status').textContent=message;$('status').classList.toggle('error',error)}
 function dirty(){return !!state.photoDirty||JSON.stringify(state.choices)!==JSON.stringify(state.saved)}
 function photoControls(){
@@ -26,7 +26,22 @@ $('photo-file').onchange=async e=>{
  const id=state.active,c=state.choices[id],index=c.style===8&&c.swapPhotos?1-state.importIndex:state.importIndex;setBusy(true);
  try{const data=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result.split(',')[1]);r.onerror=()=>reject(Error('无法读取这张图片。'));r.readAsDataURL(file)});await importPhoto({index,name:file.name,data},id)}catch(e){setBusy(false);status(e.message,true)}
 };
-$('use-folder').onclick=()=>importPhoto({mode:'folder'});
+$('open-folder').onclick=async()=>{
+ setBusy(true);
+ try{const data=await (await api('/api/open-folder',{slot:state.active})).json();status(data.message)}
+ catch(e){status(e.message,true)}finally{setBusy(false)}
+};
+async function restorePhoto(source){
+ const id=state.active;setBusy(true);status('正在恢复图片并更新预览…');
+ try{const data=await (await api('/api/restore-photo',{slot:id,source})).json();
+  const r=state.regions.find(r=>r.id===id);r.photos=data.photos;r.photo=data.photo;state.photoDirty=true;
+  state.choices[id].swapPhotos=false;
+  if(r.photo&&state.choices[id].style===0)state.choices[id].style=1;
+  show(id);status((r.photo?(source==='current'?'已恢复当前皮肤使用的图片。':'已恢复鲸鱼娘预设配图。'):'当前皮肤此区域没有图片，已恢复为空图。')+'原有图片文件保留，点击“保存并应用”后更新皮肤。');
+ }catch(e){status(e.message,true)}finally{setBusy(false);nav()}
+}
+$('restore-current').onclick=()=>restorePhoto('current');
+$('restore-preset').onclick=()=>restorePhoto('preset');
 function adjusted(){return state.choices[state.active].photoAdjustments[state.photoIndex||0]}
 function adjustmentValue(key){const c=state.choices[state.active],r=state.regions.find(r=>r.id===state.active);return adjusted()[key]??r.layoutGeometry[c.style].angles[state.photoIndex||0]}
 function syncPosition(){for(const key of ['x','y','angle','scale'])for(const input of document.querySelectorAll('[data-position="'+key+'"]'))input.value=adjustmentValue(key)}

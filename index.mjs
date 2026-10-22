@@ -35,7 +35,8 @@ export function createLauncher(python, skinRoot = root, dshHome = null, skinDir 
         const proc = spawn(python, ['-u', script, '--no-browser'], {
           cwd: skinRoot, windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'],
           env: { ...process.env, ...(dshHome ? { DSH_HOME: dshHome } : {}),
-            ...(skinDir ? { DIY_JOURNAL_SKIN_DIR: skinDir } : {}), PYTHONIOENCODING: 'utf-8' }
+            ...(skinDir ? { DIY_JOURNAL_SKIN_DIR: skinDir } : {}),
+            DIY_JOURNAL_BUNDLED_SKIN_DIR: join(root, 'skin'), PYTHONIOENCODING: 'utf-8' }
         });
         child = proc;
         let output = '', errors = '', ready = false;

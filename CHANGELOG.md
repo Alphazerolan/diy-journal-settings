@@ -1,5 +1,15 @@
 # Changelog / 更新记录
 
+## 1.1.2 — 2026-10-22
+
+- 图片操作增加“打开文件夹”，直接打开当前区域目录，不改变当前选图。
+- 分别恢复当前皮肤使用的图片、随插件附带的鲸鱼娘预设配图；更新当前区域预览，保存并应用后更新皮肤。
+- 保留原有图片及布局，补充设置入口和新版样式菜单截图。
+
+- Open the current area's photo folder without changing its selection.
+- Restore photos from the installed skin or bundled Whale-chan presets independently; preview immediately and apply only on Save and apply.
+- Preserve existing photo files and layouts; add settings-entry and updated editor screenshots.
+
 ## 1.1.1 — 2026-10-22
 
 - 内置皮肤更新至 1.14.3，合并重复素材并对装饰图进行无损压缩。

@@ -150,6 +150,13 @@ def main():
                 if not 0<length<=limit:raise ValueError('请求大小错误')
                 if self.headers.get('Content-Type')!='application/json':raise ValueError('请求格式错误')
                 payload=json.loads(self.rfile.read(length))
+                if self.path=='/api/open-folder':
+                    if not isinstance(payload,dict) or payload.get('slot') not in slot_map:raise ValueError('无效图片区域。')
+                    return self.reply(200,photo_import.open_folder(ROOT,slot_map[payload['slot']]))
+                if self.path=='/api/restore-photo':
+                    if not isinstance(payload,dict) or payload.get('slot') not in slot_map:raise ValueError('无效图片区域。')
+                    with save_lock:photos=photo_import.restore(ROOT,slot_map[payload['slot']],payload.get('source'))
+                    return self.reply(200,{'photos':photos,'photo':photos[0] if photos else None})
                 if self.path=='/api/photo':
                     if not isinstance(payload,dict) or payload.get('slot') not in slot_map:raise ValueError('无效图片区域。')
                     with save_lock:photos=photo_import.select(ROOT,slot_map[payload['slot']],payload)

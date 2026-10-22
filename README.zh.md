@@ -6,7 +6,7 @@
 
 为了贴合手账本自由拼贴的特性，本插件将 **DIY 手账本皮肤 1.14.3 与样式菜单** 放在同一个安装包中。你可以在 **设置 → DIY 手账本** 应用皮肤、打开菜单，调整各个位置的布局与样式、更换图片，搭配胶带、白边和题字，组装属于自己的手账本。
 
-[下载插件 1.1.1](https://github.com/Alphazerolan/diy-journal-settings/releases/tag/v1.1.1) ·
+[下载插件 1.1.2](https://github.com/Alphazerolan/diy-journal-settings/releases/tag/v1.1.2) ·
 [纯皮肤版本与组件展示](https://github.com/Alphazerolan/diy-journal-skin) ·
 [更新记录](CHANGELOG.md)
 
@@ -20,6 +20,22 @@
 - **按区域自由拼贴：** 主界面、侧栏和设置各页独立选择照片与布局，支持移动、倾斜、缩放、胶带颜色与纹样、宽窄白边及题字。
 - **双照片与空图样式：** 调换两张照片的顺序及遮挡关系；不设置照片时收起图片区，不留空白占位。
 - **场景预览：** 在菜单中查看对应主界面或设置区域的效果，保存后刷新 DSH 应用。自选照片保存在本机。
+
+## 样式菜单
+
+在 **设置 → DIY 手账本** 中打开样式菜单。
+
+![DSH 设置中的 DIY 手账本入口](docs/images/diy-settings-entry.png)
+
+- **打开文件夹：** 打开当前区域的图片目录，不改变当前选图。添加图片后可通过“选择图片”选用。
+- **恢复皮肤现用图片：** 从已安装的 DIY 手账本中读取当前区域正在使用的照片，恢复到菜单预览。
+- **恢复鲸鱼娘预设图：** 恢复随插件附带、效果图中展示的对应区域鲸鱼娘配图。
+
+两个恢复按钮只作用于当前区域，保留已有图片文件和布局参数；当前选择“不设置照片”时，恢复有图会启用单胶带布局以显示预览。**点击“保存并应用”后才更新皮肤**，随后刷新 DSH 查看。
+
+下图为更新后的样式菜单实际运行截图；菜单底部的皮肤场景使用静态示例内容。
+
+![样式菜单：选图、打开文件夹、两种恢复方式及场景预览](docs/images/diy-style-menu.png)
 
 ## 效果预览
 
@@ -64,7 +80,7 @@
 从上方下载入口取得 `.tgz` 文件，再通过标准插件管理方式安装，例如桌面档案：
 
 ```powershell
-dsh plugin --profile desktop add "C:/Downloads/alphazerolan-dsh-plugin-diy-journal-1.1.1.tgz"
+dsh plugin --profile desktop add "C:/Downloads/alphazerolan-dsh-plugin-diy-journal-1.1.2.tgz"
 ```
 
 Web 用户将 `desktop` 换成 `web`。完全退出并重启对应 DSH 实例，打开
@@ -108,7 +124,7 @@ Python 自动检测，特殊环境可设置 `DIY_JOURNAL_PYTHON` 为其绝对路
 ```sh
 npm run build
 npm test
-python tests/test_install.py
+npm run test:python
 npm pack
 ```
 
