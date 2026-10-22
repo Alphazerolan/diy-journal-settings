@@ -1,8 +1,9 @@
 import { spawn } from 'node:child_process';
 import { randomBytes, timingSafeEqual } from 'node:crypto';
-import { readFileSync, existsSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { resolve, dirname, join } from 'node:path';
+import { paths, provision, findPython, prepareEditor } from './runtime.mjs';
 
 export const name = 'diy-journal-settings';
 export const inject = ['webServer'];
@@ -21,7 +22,7 @@ export function localRequest(req) {
   } catch { return false; }
 }
 
-export function createLauncher(python, skinRoot = root, dshHome = null) {
+export function createLauncher(python, skinRoot = root, dshHome = null, skinDir = null) {
   let child = null, url = null, pending = null;
   return {
     running: () => Boolean(child && url),
@@ -33,7 +34,8 @@ export function createLauncher(python, skinRoot = root, dshHome = null) {
       pending = new Promise((accept, reject) => {
         const proc = spawn(python, ['-u', script, '--no-browser'], {
           cwd: skinRoot, windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'],
-          env: { ...process.env, ...(dshHome ? { DSH_HOME: dshHome } : {}), PYTHONIOENCODING: 'utf-8' }
+          env: { ...process.env, ...(dshHome ? { DSH_HOME: dshHome } : {}),
+            ...(skinDir ? { DIY_JOURNAL_SKIN_DIR: skinDir } : {}), PYTHONIOENCODING: 'utf-8' }
         });
         child = proc;
         let output = '', errors = '', ready = false;
@@ -66,8 +68,23 @@ export function createLauncher(python, skinRoot = root, dshHome = null) {
 }
 
 export function apply(ctx) {
-  const runtime = JSON.parse(readFileSync(join(root, 'runtime.json'), 'utf8'));
-  const launcher = createLauncher(runtime.python, runtime.workspace, runtime.dshHome);
+  const locations = paths();
+  let installation, setupError, launcher, opening, disposed = false;
+  try { installation = provision(join(root, 'skin'), locations); }
+  catch (error) { setupError = error.message; }
+  async function open() {
+    if (disposed) throw new Error('插件已停用，请重新打开设置。');
+    if (setupError) throw new Error(setupError);
+    if (launcher) return launcher.open();
+    if (!opening) opening = (async () => {
+      const python = await findPython();
+      await prepareEditor(root, locations, python);
+      if (disposed) throw new Error('插件已停用。');
+      launcher = createLauncher(python, locations.workspace, locations.home, locations.skin);
+      return launcher.open();
+    })().finally(() => { opening = null; });
+    return opening;
+  }
   const token = randomBytes(32).toString('hex');
   const reply = (res, code, data) => {
     res.writeHead(code, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' });
@@ -78,7 +95,8 @@ export function apply(ctx) {
       ctx.webServer.register({ kind: 'exact', path: prefix + '/status', handler(req, res) {
         if (!localRequest(req)) return reply(res, 403, { error: '仅支持本机访问。' });
         if (req.method !== 'GET') return reply(res, 405, { error: '请求方式错误。' });
-        reply(res, 200, { token, running: launcher.running() });
+        reply(res, 200, { token, running: launcher?.running() || false, skin: installation,
+          error: setupError || null });
       }}),
       ctx.webServer.register({ kind: 'exact', path: prefix + '/open', async handler(req, res) {
         if (!localRequest(req)) return reply(res, 403, { error: '仅支持本机访问。' });
@@ -86,10 +104,10 @@ export function apply(ctx) {
         if (supplied.length !== token.length || !timingSafeEqual(supplied, Buffer.from(token)))
           return reply(res, 403, { error: '入口已过期，请重新打开设置。' });
         if (req.method !== 'POST') return reply(res, 405, { error: '请求方式错误。' });
-        try { reply(res, 200, { url: await launcher.open() }); }
+        try { reply(res, 200, { url: await open() }); }
         catch (error) { reply(res, 500, { error: error.message }); }
       }})
     ];
-    return () => { disposers.forEach(dispose => dispose?.()); launcher.dispose(); };
+    return () => { disposed = true; disposers.forEach(dispose => dispose?.()); launcher?.dispose(); };
   });
 }

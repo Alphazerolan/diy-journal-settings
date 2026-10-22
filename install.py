@@ -11,11 +11,14 @@ def write(path,text):
     path.parent.mkdir(parents=True,exist_ok=True)
     tmp=path.with_suffix(path.suffix+'.tmp');tmp.write_text(text,encoding='utf-8');tmp.replace(path)
 
-def prepare(home):
-    skin=home/'skins/diy-journal';work=home/'diy-journal-editor'
+def prepare(home,skin_dir=None):
+    skin=skin_dir or home/'skins/diy-journal';work=home/'diy-journal-editor'
     if not (skin/'skin.json').is_file() or json.loads((skin/'skin.json').read_text(encoding='utf-8')).get('id')!='diy-journal':
         raise ValueError('Install the DIY Journal skin before the editor.')
-    if skin.is_symlink() or work.is_symlink():raise ValueError('Linked skin/workspace directories are unsupported.')
+    def plain(path):
+        if any(p.is_symlink() or (hasattr(p,'is_junction') and p.is_junction()) for p in (path,*path.parents)):
+            raise ValueError('Linked skin/workspace paths are unsupported.')
+    plain(skin);plain(work)
     for folder in (skin,ROOT/'engine'):
         for p in folder.rglob('*'):
             if not p.is_file() or '__pycache__' in p.parts:continue
@@ -23,6 +26,7 @@ def prepare(home):
             if folder==skin and rel.parts[0] not in ('assets','skin.json','skin.css','patches.css','hooks.mjs','NOTICE','README.md','README.zh.md','LICENSE'):continue
             if p.is_symlink():raise ValueError('Linked files are unsupported.')
             dest=work/rel
+            plain(p);plain(dest)
             # Existing photos and layout choices survive plugin upgrades.
             if dest.exists() and (rel.parts[0]=='DIY图片' or (folder==skin and rel.parts[0]=='assets')):continue
             dest.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(p,dest)
@@ -58,7 +62,6 @@ def prepare(home):
                 if len(chosen)==2:break
         write(selection,json.dumps({'mode':'selected','pictures':(chosen+[None,None])[:2]},ensure_ascii=False,indent=2)+'\n')
         marker.touch()
-    write(ROOT/'runtime.json',json.dumps({'python':sys.executable,'workspace':str(work),'dshHome':str(home)},indent=2)+'\n')
     return work
 
 def register(home,uninstall=False):
@@ -81,10 +84,12 @@ def main():
     parser.add_argument('--dsh-home',type=Path,default=Path(os.environ.get('DSH_HOME',str(Path.home()/'.dsh'))))
     parser.add_argument('--uninstall',action='store_true')
     parser.add_argument('--prepare-only',action='store_true')
+    parser.add_argument('--skin-dir',type=Path)
     args=parser.parse_args();home=args.dsh_home.resolve()
     if args.uninstall:register(home,True);print('Editor entry removed. Personal photos and skin preserved. Restart Harness.');return
-    work=prepare(home)
-    if not args.prepare_only:register(home)
+    work=prepare(home,args.skin_dir)
+    if not args.prepare_only:
+        raise ValueError('Use the standard DSH plugin installer. Manual profile registration is retired.')
     print('Editor prepared: '+str(work))
     print('Restart Harness, then open Settings > DIY Journal.')
 

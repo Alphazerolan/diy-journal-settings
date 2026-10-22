@@ -2,7 +2,7 @@ const token=location.hash.slice(1)||sessionStorage.getItem('diy-style-token')||'
 const state={regions:[],styles:[],colors:[],patterns:[],choices:{},saved:{},active:null,epoch:0,urls:[],busy:false,closed:false,loaded:false};
 sessionStorage.setItem('diy-style-token',token);history.replaceState(null,'',location.pathname);
 const $=id=>document.getElementById(id),clone=x=>JSON.parse(JSON.stringify(x));
-async function api(path,body){const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),['/api/save','/api/photo'].includes(path)?60000:12000);try{const r=await fetch(path,{method:body===undefined?'GET':'POST',signal:controller.signal,headers:{'X-DIY-Token':token,...(body===undefined?{}:{'Content-Type':'application/json'})},body:body===undefined?undefined:JSON.stringify(body)});if(!r.ok){let e=await r.json();throw Error(e.message)}return r;}catch(e){if(e.name==='AbortError'||e instanceof TypeError){$('retry').hidden=false;throw Error('本地菜单服务未连接。请先点击“重新连接”；仍失败时，双击“打开样式菜单.cmd”重新启动。')}throw e}finally{clearTimeout(timer)}}
+async function api(path,body){const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),['/api/save','/api/photo'].includes(path)?60000:12000);try{const r=await fetch(path,{method:body===undefined?'GET':'POST',signal:controller.signal,headers:{'X-DIY-Token':token,...(body===undefined?{}:{'Content-Type':'application/json'})},body:body===undefined?undefined:JSON.stringify(body)});if(!r.ok){let e=await r.json();throw Error(e.message)}return r;}catch(e){if(e.name==='AbortError'||e instanceof TypeError){$('retry').hidden=false;throw Error('本地菜单服务未连接。请先点击“重新连接”；仍失败时，请在 DSH 设置 → DIY 手账本中重新打开样式菜单。')}throw e}finally{clearTimeout(timer)}}
 function status(message,error=false){$('status').textContent=message;$('status').classList.toggle('error',error)}
 function dirty(){return !!state.photoDirty||JSON.stringify(state.choices)!==JSON.stringify(state.saved)}
 function photoControls(){
@@ -177,7 +177,7 @@ function show(id){
 }
 $('reset').onclick=()=>{for(const r of state.regions)state.choices[r.id].style=1;show(state.active);status('全部区域已选样式 1，胶带纹样与颜色未改变。保存后生效。')};
 $('save').onclick=async()=>{state.busy=true;for(const b of document.querySelectorAll('button,input'))b.disabled=true;status('正在保存布局与胶带设置…');try{const res=await (await api('/api/save',state.choices)).json();if(res.ok||res.saved){state.saved=clone(state.choices);state.photoDirty=false;}status(res.message,!res.ok)}catch(e){status(e.message,true)}finally{state.busy=false;for(const b of document.querySelectorAll('button,input'))b.disabled=false;nav();pairControls();photoControls()}};
-$('close').onclick=async()=>{if(dirty()&&!confirm('还有未保存的选择，确定关闭吗？'))return;try{await api('/api/close',{});state.closed=true;state.saved=clone(state.choices);status('菜单已关闭。再次使用请双击“打开样式菜单.cmd”。');for(const b of document.querySelectorAll('button,input'))b.disabled=true}catch(e){status(e.message,true)}};
+$('close').onclick=async()=>{if(dirty()&&!confirm('还有未保存的选择，确定关闭吗？'))return;try{await api('/api/close',{});state.closed=true;state.saved=clone(state.choices);status('菜单已关闭。再次使用请在 DSH 设置 → DIY 手账本中打开样式菜单。');for(const b of document.querySelectorAll('button,input'))b.disabled=true}catch(e){status(e.message,true)}};
 window.addEventListener('beforeunload',e=>{if(dirty()){e.preventDefault();e.returnValue=''}});
 async function connect(){try{
  if(state.loaded){await api('/api/ping');$('retry').hidden=true;status('连接已恢复，未保存的选择仍保留。');return}

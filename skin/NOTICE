@@ -1,0 +1,67 @@
+DIY Journal / DIY 手账本 1.14.2
+
+ILLUSTRATIONS / 插画
+The 14 Whale-chan illustrations were generated with ChatGPT (OpenAI image generation)
+on 2026-10-21. Each location used an independent theme and prompt. Their source is
+ChatGPT generation, not a download from the reference video. Generated images are
+embedded in assets/diy-generated/*.svg. See ARTWORK.json for hashes and themes.
+14 张鲸鱼娘配图均由 ChatGPT 生成，按位置使用独立主题与提示词。
+
+CHARACTER ATTRIBUTION / 角色署名
+Character / 角色：DeepSeek 鲸鱼娘（大肥鱼）/ Whale-chan，蓝发女仆二创形象。
+
+1. 原始角色设计 / Original character design: 上善
+   https://www.pixiv.net/users/62155430
+   鲸鱼娘的原始角色形象。 / The original whale-girl character design.
+
+2. DeepSeek 女仆再设计 / DeepSeek maid redesign: ZipZipPipe
+   https://www.pixiv.net/users/18604994
+   在鲸鱼娘形象基础上加入 DeepSeek 元素的女仆设计，使用 GPT Image 2 生成。
+   The maid redesign incorporating DeepSeek elements, generated with GPT Image 2.
+
+3. 本皮肤制作 / This skin: Alphazerolan
+   https://github.com/Alphazerolan/diy-journal-skin
+   基于上述形象参考，使用 ChatGPT 为手账本各区域分别生成 14 张主题插画，
+   并完成布局、装饰和皮肤适配；未复制其他皮肤的插画文件。
+   Created 14 separately themed illustrations with ChatGPT using the character
+   references above, then arranged and integrated them into this journal skin.
+   Illustration files from other skins are not included.
+
+署名资料 / Attribution record:
+https://github.com/Small-tailqwq/dsh-deep-whale/blob/main/maid-atelier/NOTICE
+形象参考 / Visual reference:
+https://www.bilibili.com/video/BV16qhJ6qEHG/
+
+本项目为非官方二创，角色设计权利归相应创作者。以上署名依据公开资料整理；
+本项目的角色再分发授权尚未独立核实。ChatGPT 生成不代表 DeepSeek 官方授权。
+This is an unofficial fan work; character-design rights remain with their
+respective creators. Credits follow public attribution records. Permission to
+redistribute this character in this project remains independently unverified.
+ChatGPT generation does not imply official DeepSeek authorization.
+
+DECORATIVE ASSETS / 装饰素材
+Paper, tape, frames, doodles and hand-lettered headings are project-created SVGs or
+ChatGPT-generated raster decorations, some manually arranged or refined. They are
+not the previous Koe illustrations. No Koe photos, personal input photographs,
+Archive folders, reference screenshot or video frames are included in this package.
+The DeepSeek name and whale mark identify the host application; no affiliation or
+ownership of its marks is claimed.
+
+FONTS / 字体
+LXGW WenKai: Copyright LXGW and Klee Project Authors; SIL Open Font License 1.1.
+https://github.com/lxgw/LxgwWenKai
+Full license: assets/LXGWWenKai-OFL.txt
+Long Cang: Copyright 2018 The Long Cang Project Authors; SIL Open Font License 1.1.
+https://github.com/googlefonts/longcang
+Full license: assets/LongCang-OFL-v215.txt
+
+LICENSE SCOPE / 授权范围
+本皮肤随附的插画及角色画面仅限个人非商业使用；角色及其他第三方权利仍归相应权利人，本声明不授予第三方权利或官方授权。
+The illustrations and character artwork bundled with this skin are for personal, non-commercial use only. Character and other third-party rights remain with their respective holders; this notice grants no third-party rights or official authorization.
+
+Project-authored code is MIT licensed. The contributor permits redistribution of
+project-created decorations and generated outputs to the extent of their rights,
+subject to the personal, non-commercial restriction on illustrations and character artwork;
+this does not grant rights belonging to character creators, font authors or brands.
+Third-party rights and the font licenses remain applicable. Character clearance
+is outstanding and is explicitly disclosed to Workshop reviewers.

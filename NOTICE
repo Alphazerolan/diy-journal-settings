@@ -1,2 +1,12 @@
-Editor code created with ChatGPT assistance for Alphazerolan. No character illustrations or user photographs are bundled. Paper/tape assets are project-created or ChatGPT-generated. Fonts used by the installed skin retain their OFL licenses in the skin assets directory. See the skin NOTICE for artwork credits.
-编辑器由 ChatGPT 辅助开发；不附带角色插画或个人照片。字体保留 OFL 授权。
+DIY Journal bundle / DIY 手账本一体化插件
+
+Code: Copyright (c) 2026 Alphazerolan; MIT (LICENSE).
+This bundle contains the skin, local editor and 14 ChatGPT-generated Whale-chan illustrations.
+Character attribution, personal non-commercial artwork terms, and third-party rights:
+skin/NOTICE and skin/ARTWORK.json. AI generation does not constitute character authorization.
+Fonts retain their SIL OFL licenses under skin/assets.
+No user-selected photos, credentials or personal runtime configuration are distributed.
+
+代码采用 MIT 授权；随包预设插画由 ChatGPT 生成。
+角色署名、插画仅限个人非商业使用的声明见 skin/NOTICE，插画记录见 skin/ARTWORK.json。
+AI 生成不代表已取得角色授权。字体保留 SIL OFL 授权。不包含个人照片或运行配置。

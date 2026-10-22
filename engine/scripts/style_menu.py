@@ -110,7 +110,7 @@ def main():
                     if not asset.is_file() or asset.suffix.lower() not in set(build.MIMES)|{'.woff','.woff2','.ttf','.otf'}:raise ValueError()
                     return self.reply(200,asset.read_bytes(),mimetypes.guess_type(asset.name)[0] or 'application/octet-stream')
                 except (ValueError,OSError):return self.reply(404,{'message':'预览资源不存在'})
-            if not self.authorized():return self.reply(403,{'message':'菜单已失效，请重新双击启动样式菜单。'})
+            if not self.authorized():return self.reply(403,{'message':'菜单已失效，请在 DSH 设置 → DIY 手账本中重新打开样式菜单。'})
             activity[0]=time.monotonic()
             try:
                 if path.path=='/api/ping':return self.reply(200,{'ok':True})

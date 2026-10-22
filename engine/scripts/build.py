@@ -188,7 +188,7 @@ def build():
     print('Built %d regions: %d with images, %d empty.'%(len(slots),sum(occupied.values()),len(slots)-sum(occupied.values())))
 
 def install():
-    target=Path(os.environ.get('DSH_HOME', str(Path.home()/'.dsh')))/'skins/diy-journal'
+    target=Path(os.environ.get('DIY_JOURNAL_SKIN_DIR') or str(Path(os.environ.get('DSH_HOME', str(Path.home()/'.dsh')))/'skins/diy-journal'))
     if target.resolve()==ROOT.resolve():return
     if not (target/'skin.json').is_file() or json.loads((target/'skin.json').read_text(encoding='utf-8')).get('id')!='diy-journal':
         raise ValueError('Install the DIY Journal skin first.')

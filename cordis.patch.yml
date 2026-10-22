@@ -1,0 +1,3 @@
+- insert:
+    - id: ui-diy-journal
+      name: '@alphazerolan/dsh-plugin-diy-journal'
