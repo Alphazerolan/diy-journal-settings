@@ -7,11 +7,11 @@ components as the developer could think of—from the home screen, sidebars and
 conversation bubbles to menus, cards and tool panels. [See the preview](#preview).
 
 To bring the freedom of a scrapbook to the skin, this plugin bundles **DIY Journal
-skin 1.14.2 and its style menu** in one installation. Use **Settings > DIY Journal**
+skin 1.14.3 and its style menu** in one installation. Use **Settings > DIY Journal**
 to apply it, adjust layouts and styles in each area, replace images, and combine
 tape, photo borders and captions to make the journal your own.
 
-[Download plugin 1.1.0](https://github.com/Alphazerolan/diy-journal-settings/releases/tag/v1.1.0) ·
+[Download plugin 1.1.1](https://github.com/Alphazerolan/diy-journal-settings/releases/tag/v1.1.1) ·
 [Standalone skin and component gallery](https://github.com/Alphazerolan/diy-journal-skin) ·
 [Changelog](CHANGELOG.md)
 
@@ -71,7 +71,7 @@ User messages use blue grid-paper notes. DeepSeek replies use lined paper with a
 Download the `.tgz` from the link above and install it with the standard plugin manager:
 
 ```powershell
-dsh plugin --profile desktop add "C:/Downloads/alphazerolan-dsh-plugin-diy-journal-1.1.0.tgz"
+dsh plugin --profile desktop add "C:/Downloads/alphazerolan-dsh-plugin-diy-journal-1.1.1.tgz"
 ```
 
 Use `web` instead of `desktop` for Web profiles. Fully restart that DSH instance.

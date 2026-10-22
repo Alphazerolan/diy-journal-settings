@@ -4,9 +4,9 @@
 
 本皮肤以手账本为主题，为 DeepSeek Harness（DSH）重绘了开发者尽可能想到的界面组件，从主界面、侧栏、对话气泡，到菜单、卡片和工具面板，让日常使用也有翻阅手账的感觉。[查看效果预览](#效果预览)。
 
-为了贴合手账本自由拼贴的特性，本插件将 **DIY 手账本皮肤 1.14.2 与样式菜单** 放在同一个安装包中。你可以在 **设置 → DIY 手账本** 应用皮肤、打开菜单，调整各个位置的布局与样式、更换图片，搭配胶带、白边和题字，组装属于自己的手账本。
+为了贴合手账本自由拼贴的特性，本插件将 **DIY 手账本皮肤 1.14.3 与样式菜单** 放在同一个安装包中。你可以在 **设置 → DIY 手账本** 应用皮肤、打开菜单，调整各个位置的布局与样式、更换图片，搭配胶带、白边和题字，组装属于自己的手账本。
 
-[下载插件 1.1.0](https://github.com/Alphazerolan/diy-journal-settings/releases/tag/v1.1.0) ·
+[下载插件 1.1.1](https://github.com/Alphazerolan/diy-journal-settings/releases/tag/v1.1.1) ·
 [纯皮肤版本与组件展示](https://github.com/Alphazerolan/diy-journal-skin) ·
 [更新记录](CHANGELOG.md)
 
@@ -64,7 +64,7 @@
 从上方下载入口取得 `.tgz` 文件，再通过标准插件管理方式安装，例如桌面档案：
 
 ```powershell
-dsh plugin --profile desktop add "C:/Downloads/alphazerolan-dsh-plugin-diy-journal-1.1.0.tgz"
+dsh plugin --profile desktop add "C:/Downloads/alphazerolan-dsh-plugin-diy-journal-1.1.1.tgz"
 ```
 
 Web 用户将 `desktop` 换成 `web`。完全退出并重启对应 DSH 实例，打开

@@ -113,7 +113,7 @@ def rules(slots, occupied, selections=None):
     if not occupied['home']:
         chat=SEL+'[data-conversation-region="chat"]'
         out.append(chat+'{--diy-art-top:18px;--diy-paper-veil:linear-gradient(transparent,transparent);background-color:var(--sj-paper)!important;'
-                   'background-image:var(--diy-paper-veil),url("assets/diy-backgrounds/color.png"),repeating-linear-gradient(0deg,transparent 0 35px,var(--sj-line) 35px 36px),url("assets/journal-paper-v80.svg")!important;'
+                   'background-image:var(--diy-paper-veil),url("assets/diy-backgrounds/color.webp"),repeating-linear-gradient(0deg,transparent 0 35px,var(--sj-line) 35px 36px),url("assets/journal-paper-v80.svg")!important;'
                    'background-size:100% 100%,calc(100% - 28px) calc(100% - var(--diy-art-top) - 18px),100% 36px,160px 160px!important;'
                    'background-position:center,center bottom 18px,center,center!important;background-repeat:no-repeat,no-repeat,repeat,repeat!important;}')
         out.append(chat+':has(> .Dc7zOa_headerBlank){--diy-art-top:90px;}')
@@ -126,7 +126,7 @@ def rules(slots, occupied, selections=None):
     out.append('body[data-ds-dark-theme] .Dc7zOa_headerBlank::before{filter:brightness(1.8) saturate(.7)!important;}')
     out.append('@media(max-width:700px){'+SEL+'.Dc7zOa_headerBlank{min-height:56px!important;}'+SEL+'.Dc7zOa_headerBlank::before{left:12px!important;max-width:calc(100% - 64px)!important;height:52px!important;}}')
     # Preserve the original Explore headline artwork and native Preview badge positioning.
-    out.append(SEL+'.Hqq-bq_headline::before{background-image:url("assets/journal-hero-sticker-v86.png")!important;}')
+    out.append(SEL+'.Hqq-bq_headline::before{background-image:url("assets/journal-hero-sticker-v86.webp")!important;}')
     return '\n'.join(out)+'\n'
 
 
@@ -165,7 +165,6 @@ def build():
     outputs['generated/slots.css']=css
     outputs['generated/empty-slots.css']=rules(slots,{s['id']:False for s in slots},selections)
     outputs['generated/build-report.json']=json.dumps(report,ensure_ascii=False,indent=2)
-    outputs['assets/diy-generated/cover.svg']=(ROOT/'assets/diy-title.svg').read_text(encoding='utf-8')
     cards=[]
     for s in slots:
         name=html.escape(s['folder']);key=s['id']
@@ -173,7 +172,7 @@ def build():
         style_name=next(x['name'] for x in choices if x['id']==selections[key])
         cards.append(f'<section><h2>{name}</h2><p>样式 {selections[key]} · {html.escape(style_name)}</p>{photo}</section>')
     outputs['generated/index.html']='''<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>DIY 手账本 · 图片区域预览</title><style>*{box-sizing:border-box}body{margin:0;padding:28px;color:#315b73;background:repeating-linear-gradient(0deg,transparent 0 23px,#a5cbd426 23px 24px),#e8f3f7;font:15px "Microsoft YaHei",sans-serif}header{max-width:1120px;margin:0 auto 28px}header img{width:310px}main{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;max-width:1120px;margin:auto}section{border:1px solid #d7ceb5;border-radius:7px;padding:18px;background:#fffbef;box-shadow:0 3px 7px #647b8219}h2{font-size:17px;margin:0 0 15px}small{color:#7390a0}.pair{display:grid;grid-template-columns:1fr 1fr;gap:14px}.bay{margin-top:10px;background:repeating-linear-gradient(90deg,transparent 0 20px,#b5b08916 20px 21px);width:100%;position:relative}.bay img{width:100%;height:100%;display:block;object-fit:contain}@media(max-width:700px){main{grid-template-columns:1fr}body{padding:15px}}</style><header><img src="cover.svg" alt="手账本"><h1>图片区域 · 有图 / 留空对照</h1><p>14 个文件夹独立换图。留空保留位置，不显示胶带或白边。设置页只保留照片与粘贴结构。</p></header><main>'''+''.join(cards)+'</main></html>'
-    outputs['generated/index.html']=outputs['generated/index.html'].replace('src="cover.svg"','src="../assets/diy-generated/cover.svg"')
+    outputs['generated/index.html']=outputs['generated/index.html'].replace('src="cover.svg"','src="../assets/diy-title.svg"')
     outputs['generated/index.html']=outputs['generated/index.html'].replace('图片区域 · 有图 / 留空对照','图片区域 · 当前状态').replace('留空保留位置，不显示胶带或白边。','无图片时收起图片区，不预留位置，不显示胶带或白边。')
     # The live skin server serves only assets/ and preview/ paths, never generated/.
     for relative in re.findall(r'url\([\"\x27]?([^\)\"\x27]+)', outputs['patches.css']):

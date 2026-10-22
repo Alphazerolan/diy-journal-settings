@@ -1,5 +1,15 @@
 # Changelog / 更新记录
 
+## 1.1.1 — 2026-10-22
+
+- 内置皮肤更新至 1.14.3，合并重复素材并对装饰图进行无损压缩。
+- 同步编辑器模板与图片引用，避免保存后恢复旧文件引用；预览标题复用同一份素材。
+- 字体、预设照片和用户自选图片保持原样；已有照片与布局继续保留。
+
+- Bundle skin 1.14.3 with deduplicated assets and losslessly compressed decorations.
+- Update editor templates and image references; reuse the title asset in previews.
+- Keep fonts, preset illustrations and personal photos unchanged; preserve existing layouts.
+
 ## 1.1.0 — 2026-10-22
 
 - 将独立样式菜单升级为标准 DSH 一体化插件，内置 DIY 手账本皮肤 1.14.2。

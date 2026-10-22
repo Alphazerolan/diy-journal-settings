@@ -1,6 +1,6 @@
 {
   "name": "@alphazerolan/dsh-plugin-diy-journal",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "DIY Journal skin and local photo/layout editor in one DeepSeek Harness bundle",
   "type": "module",
   "main": "index.mjs",
@@ -33,12 +33,24 @@
     "LICENSE"
   ],
   "license": "SEE LICENSE IN NOTICE",
-  "engines": { "node": ">=22" },
-  "peerDependencies": { "@deepseek-ai/dsh": ">=0.2.1-rc.2" },
-  "peerDependenciesMeta": { "@deepseek-ai/dsh": { "optional": true } },
+  "engines": {
+    "node": ">=22"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/dsh": ">=0.2.1-rc.2"
+  },
+  "peerDependenciesMeta": {
+    "@deepseek-ai/dsh": {
+      "optional": true
+    }
+  },
   "dsh": {
-    "engines": { "dsh": ">=0.2.1-rc.2" },
-    "bundle": { "patch": "./cordis.patch.yml" },
+    "engines": {
+      "dsh": ">=0.2.1-rc.2"
+    },
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
     "client": {
       "platform": "web",
       "inject": [
