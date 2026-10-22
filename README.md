@@ -100,6 +100,7 @@ and restarting. Do not load both entries. Personal data and the skin are retaine
   `$DSH_HOME/diy-journal-editor-backups`.
 - Existing manual installs are adopted conservatively: unknown differences
   stay unchanged. Preserved files do not receive upstream changes to those files.
+- When custom or extra files exist, retain older assets that they may reference. A customized installation may therefore use more space than a fresh install.
 - Saving only updates DIY Journal; it never selects it over another active skin.
 - Switching away cleans the plugin's state markers; switching back mounts them.
 - Disabling/uninstalling closes the menu and enhancements, retaining the asset

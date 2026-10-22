@@ -32,6 +32,20 @@ test('fresh install includes skin; upgrade preserves edits and backs up replaced
   assert.equal(provision(bundle, locations).changed, 0);
 });
 
+test('asset cleanup retains dependencies of custom styles and extra user files', t => {
+  for (const customization of ['skin.css', 'custom.css', null]) {
+    const { bundle, put, locations } = fixture(t);
+    provision(bundle, locations);
+    if (customization) writeFileSync(join(locations.skin, customization), 'body {background:url(assets/photo.svg)}');
+    rmSync(join(bundle, 'assets/photo.svg'));
+    put('assets/photo.webp', 'compact default');
+    put('skin.css', 'body {background:url(assets/photo.webp)}');
+    provision(bundle, locations);
+    assert.equal(existsSync(join(locations.skin, 'assets/photo.svg')), Boolean(customization));
+    assert.equal(existsSync(join(locations.skin, 'assets/photo.webp')), true);
+  }
+});
+
 test('adopting an existing manual skin preserves unknown custom bytes', t => {
   const { bundle, locations } = fixture(t);
   mkdirSync(locations.skin, { recursive: true });

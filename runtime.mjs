@@ -90,10 +90,14 @@ export function provision(bundle, locations) {
       else preserved.push(rel);
     }
   }
+  // Preserved custom styles or extra user files may still reference old names.
+  // Only prune obsolete defaults when the installation has no custom content.
+  const hasLocalCustomizations = preserved.length > 0 || (existing &&
+    files(skin).some(rel => !previous[rel] && !shipped[rel]));
   const removals = Object.keys(previous).filter(rel => {
     const p = child(skin, rel);
     assertPlain(p);
-    return !shipped[rel] && existsSync(p) && hash(readFileSync(p)) === previous[rel];
+    return !hasLocalCustomizations && !shipped[rel] && existsSync(p) && hash(readFileSync(p)) === previous[rel];
   });
   let backup = null;
   if (writes.length || removals.length) {
