@@ -2,9 +2,14 @@
 
 English | [中文](README.zh.md)
 
-A standard DSH bundle containing DIY Journal skin 1.14.2 and its local editor.
-First load provisions the skin. Use **Settings > DIY Journal** to apply it and
-edit photos, layouts, rotation, scale, tape, borders and captions.
+A notebook-inspired skin for DeepSeek Harness (DSH), restyling as many interface
+components as the developer could think of—from the home screen, sidebars and
+conversation bubbles to menus, cards and tool panels. [See the preview](#preview).
+
+To bring the freedom of a scrapbook to the skin, this plugin bundles **DIY Journal
+skin 1.14.2 and its style menu** in one installation. Use **Settings > DIY Journal**
+to apply it, adjust layouts and styles in each area, replace images, and combine
+tape, photo borders and captions to make the journal your own.
 
 [Download plugin 1.1.0](https://github.com/Alphazerolan/diy-journal-settings/releases/tag/v1.1.0) ·
 [Standalone skin and component gallery](https://github.com/Alphazerolan/diy-journal-skin) ·
@@ -14,7 +19,45 @@ This repository upgrades the former standalone editor into a skin-and-editor
 bundle. It edits DIY Journal only, not arbitrary skins. The standalone skin
 remains available for users who only need its appearance.
 
-![Bundled skin in the actual DSH window](docs/images/home.png)
+## Skin and DIY features
+
+- **Paper and hand-drawn styling:** handwritten headings, notebook pages and binder rings, tape collages, light/dark palettes, and 14 separately themed ChatGPT-generated Whale-chan illustrations.
+- **Specially designed components:** user notes and reply stationery, session paper planes, notification envelopes and their expanded state, collapsed sessions, workspace hover information, task board, account card, and an address-book remote-access dialog. [Explore the static component gallery by function](https://github.com/Alphazerolan/diy-journal-skin/blob/main/docs/COMPONENTS.md).
+- **Per-area collages:** choose photos and layouts for the home screen, sidebars and settings pages; adjust position, rotation, scale, tape colors/patterns, narrow/wide borders and captions.
+- **Two-photo and no-photo layouts:** swap photo order and overlap; choosing no photo collapses the photo area without leaving an empty placeholder.
+- **Scene previews:** preview the corresponding home or settings area in the menu, then save and refresh DSH to apply. Personal photos stay local.
+
+## Preview
+
+These are existing actual DSH window captures from the skin repository, retaining its redacted presentation. They show the bundled skin's appearance; layout can vary with DSH version, window size and content. See the [static component gallery](https://github.com/Alphazerolan/diy-journal-skin/blob/main/docs/COMPONENTS.md) for more specially designed components.
+
+### Home · Light
+
+![Light home](docs/images/diy-journal-light.jpg)
+
+### Home · Dark
+
+![Dark home](docs/images/diy-journal-dark.jpg)
+
+### Conversation bubbles · User and DeepSeek replies
+
+User messages use blue grid-paper notes. DeepSeek replies use lined paper with a handwritten signature and a paper clip. These actual window captures retain the full sidebar with personal information hidden. Each theme was selected in the app before capture.
+
+**Light**
+
+![Actual light window with user and DeepSeek reply bubbles](docs/images/diy-journal-messages-light.jpg)
+
+**Dark**
+
+![Actual dark window with user and DeepSeek reply bubbles](docs/images/diy-journal-messages-dark.jpg)
+
+### Settings · Light
+
+![Light settings](docs/images/diy-journal-settings-light.jpg)
+
+### Settings · Dark
+
+![Dark settings](docs/images/diy-journal-settings-dark.jpg)
 
 ## Requirements
 
@@ -65,6 +108,12 @@ and restarting. Do not load both entries. Personal data and the skin are retaine
 
 The menu is loopback-only, with random tokens, origin checks and a 20-minute
 idle timeout. Photos are never uploaded.
+
+## Artwork and character credits
+
+The 14 default illustrations were generated with ChatGPT; themes and records are in [ARTWORK.json](skin/ARTWORK.json). They depict **DeepSeek 鲸鱼娘（大肥鱼）/ Whale-chan**. Original character design is credited to [上善](https://www.pixiv.net/users/62155430), the DeepSeek maid redesign to [ZipZipPipe](https://www.pixiv.net/users/18604994), and this skin's illustration generation, journal layout and integration to Alphazerolan. See [NOTICE](skin/NOTICE) for sources and scope.
+
+This is an unofficial fan work; character redistribution permission has not been independently verified. AI generation does not establish character authorization. Bundled illustrations and character artwork are for personal, non-commercial use only, and third-party rights remain with their holders. Fonts retain their OFL licenses; code is [MIT](LICENSE).
 
 ## Development
 

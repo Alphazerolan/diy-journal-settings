@@ -2,9 +2,9 @@
 
 [English](README.md) | 中文
 
-标准 DSH 插件包，内置 DIY 手账本皮肤 1.14.2 和本地样式菜单。
-首次加载自动准备皮肤；在 **设置 → DIY 手账本** 应用外观、打开菜单，
-选择照片，调整布局、角度、缩放、胶带、白边和题字。
+本皮肤以手账本为主题，为 DeepSeek Harness（DSH）重绘了开发者尽可能想到的界面组件，从主界面、侧栏、对话气泡，到菜单、卡片和工具面板，让日常使用也有翻阅手账的感觉。[查看效果预览](#效果预览)。
+
+为了贴合手账本自由拼贴的特性，本插件将 **DIY 手账本皮肤 1.14.2 与样式菜单** 放在同一个安装包中。你可以在 **设置 → DIY 手账本** 应用皮肤、打开菜单，调整各个位置的布局与样式、更换图片，搭配胶带、白边和题字，组装属于自己的手账本。
 
 [下载插件 1.1.0](https://github.com/Alphazerolan/diy-journal-settings/releases/tag/v1.1.0) ·
 [纯皮肤版本与组件展示](https://github.com/Alphazerolan/diy-journal-skin) ·
@@ -13,7 +13,45 @@
 本仓库由原来的独立样式菜单升级为一体化插件。仅调整 DIY 手账本，
 不是适用于所有皮肤的通用编辑器。只需要外观时，可以继续使用纯皮肤版本。
 
-![DSH 实际窗口中的内置皮肤](docs/images/home.png)
+## 皮肤与 DIY 功能
+
+- **纸张与手绘风格：** 手写标题、纸页与活页装订、胶带拼贴，以及浅色／深色配色；内置 14 张不同主题的 ChatGPT 生成鲸鱼娘配图。
+- **专门设计的组件：** 用户便签与回复信纸、会话小飞机、通知信封及展开状态、折叠会话、工作区悬浮信息、任务看板、个人账户卡签、电话簿式远程访问窗口等。[按功能查看组件静态预览](https://github.com/Alphazerolan/diy-journal-skin/blob/main/docs/COMPONENTS.md)。
+- **按区域自由拼贴：** 主界面、侧栏和设置各页独立选择照片与布局，支持移动、倾斜、缩放、胶带颜色与纹样、宽窄白边及题字。
+- **双照片与空图样式：** 调换两张照片的顺序及遮挡关系；不设置照片时收起图片区，不留空白占位。
+- **场景预览：** 在菜单中查看对应主界面或设置区域的效果，保存后刷新 DSH 应用。自选照片保存在本机。
+
+## 效果预览
+
+以下为皮肤仓库已有的 DSH 实际窗口截图，沿用该仓库的脱敏展示；展示内置皮肤外观，布局可能随 DSH 版本、窗口大小及内容变化。更多专门设计的组件见[组件静态预览](https://github.com/Alphazerolan/diy-journal-skin/blob/main/docs/COMPONENTS.md)。
+
+### 主界面 · 浅色
+
+![浅色主界面](docs/images/diy-journal-light.jpg)
+
+### 主界面 · 深色
+
+![深色主界面](docs/images/diy-journal-dark.jpg)
+
+### 对话气泡 · 用户与 DeepSeek 回复
+
+用户消息采用蓝色方格便签，DeepSeek 回复采用带手写署名与回形针的横线信纸。截图保留完整侧栏；个人信息已隐藏，浅色与深色均在应用中切换后拍摄。
+
+**浅色**
+
+![浅色实机窗口：用户消息与 DeepSeek 回复气泡](docs/images/diy-journal-messages-light.jpg)
+
+**深色**
+
+![深色实机窗口：用户消息与 DeepSeek 回复气泡](docs/images/diy-journal-messages-dark.jpg)
+
+### 设置 · 浅色
+
+![浅色设置](docs/images/diy-journal-settings-light.jpg)
+
+### 设置 · 深色
+
+![深色设置](docs/images/diy-journal-settings-dark.jpg)
 
 ## 环境要求
 
@@ -57,6 +95,12 @@ Python 自动检测，特殊环境可设置 `DIY_JOURNAL_PYTHON` 为其绝对路
   要同时停用外观，先选择其他皮肤或点击“使用官方默认”。
 
 菜单仅监听本机，具有随机令牌、来源检查和 20 分钟空闲退出，不上传照片。
+
+## 素材与角色声明
+
+默认 14 张配图由 ChatGPT 生成，逐图主题与记录见 [ARTWORK.json](skin/ARTWORK.json)。使用的角色为 **DeepSeek 鲸鱼娘（大肥鱼）/ Whale-chan**：原始角色设计署名 [上善](https://www.pixiv.net/users/62155430)，DeepSeek 女仆再设计署名 [ZipZipPipe](https://www.pixiv.net/users/18604994)，本皮肤插画生成、手账布局与适配由 Alphazerolan 完成。详细来源与范围见 [NOTICE](skin/NOTICE)。
+
+本项目为非官方二创，角色再分发授权尚未独立核实；AI 生成不代表已取得角色授权。随附插画及角色画面仅限个人非商业使用，第三方权利仍归相应权利人。字体保留各自 OFL 授权，代码采用 [MIT](LICENSE)。
 
 ## 开发
 
