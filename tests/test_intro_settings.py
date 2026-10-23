@@ -9,7 +9,7 @@ import style_menu, build
 class IntroSettingsTests(unittest.TestCase):
     def test_save_reload_apply_and_rollback(self):
         with tempfile.TemporaryDirectory() as temp:
-            root=Path(temp)/'editor'
+            root=(Path(temp)/'editor').resolve()
             shutil.copytree(build.ROOT, root)
             shutil.copytree(Path(__file__).resolve().parents[1]/'skin', root, dirs_exist_ok=True)
             target=Path(temp)/'skin';target.mkdir()
