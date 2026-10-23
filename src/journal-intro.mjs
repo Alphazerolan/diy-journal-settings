@@ -8,12 +8,21 @@ export function watchJournalIntro(win = window, options = {}) {
     win.__diyJournalIntroStatus = text;
     doc.dispatchEvent(new win.CustomEvent('diy-journal:intro-status', { detail: text }));
   };
-  let stopPlayback = null, stopped = false, manual = false;
+  let stopPlayback = null, stopped = false, manual = false, sawPainting = false, observedBody = null;
   const reduced = win.matchMedia('(prefers-reduced-motion: reduce)');
+  const painting = () => !doc.body?.hasAttribute?.('data-we-wallpaper') &&
+    (doc.documentElement.getAttribute('data-dsh-skin') === 'diy-journal' || doc.body?.hasAttribute?.('data-dsh-diy-journal-rendering'));
   function sync() {
     if (stopped) return;
+    if (doc.body && doc.body !== observedBody) {
+      observedBody = doc.body;
+      observer.observe(observedBody, { attributes: true, attributeFilter: ['data-dsh-diy-journal-rendering', 'data-we-wallpaper'] });
+    }
     const skin = doc.documentElement.getAttribute('data-dsh-skin');
-    if (skin !== 'diy-journal' && !(options.early && !skin && !manual)) {
+    if (painting()) sawPainting = true;
+    const waiting = options.early && !sawPainting && (!skin || (options.delegated && skin === 'diy-journal-plugin')) && !manual && !doc.body?.hasAttribute?.('data-we-wallpaper') &&
+      (!options.delegated || doc.documentElement.getAttribute('data-dsh-delegated-skin') === 'diy-journal-plugin');
+    if (!painting() && !waiting) {
       stopPlayback?.(); return;
     }
     if (options.manualOnly && !manual) return;
@@ -42,7 +51,7 @@ export function watchJournalIntro(win = window, options = {}) {
     if (options.early && !manual) { layer.style.visibility = 'visible'; layer.style.opacity = '1'; }
     let done = false, frame = null, shown = false, objectUrl = null, fadeStart = null;
     const needsReady = options.early && !manual;
-    const ready = () => !needsReady || (doc.documentElement.getAttribute('data-dsh-skin') === 'diy-journal'
+    const ready = () => !needsReady || (painting()
       && !doc.querySelector('[data-dsh-boot]') && !!doc.querySelector('#root > *'));
     const request = new win.AbortController();
     const previousFocus = doc.activeElement;
@@ -114,7 +123,7 @@ export function watchJournalIntro(win = window, options = {}) {
   const replay = () => {
     stopPlayback?.(); manual = true; win[key] = false; sync();
   };
-  observer.observe(doc.documentElement, { attributes: true, attributeFilter: ['data-dsh-skin'] });
+  observer.observe(doc.documentElement, { attributes: true, attributeFilter: ['data-dsh-skin', 'data-dsh-delegated-skin'] });
   doc.addEventListener('DOMContentLoaded', sync, { once: true });
   doc.addEventListener('visibilitychange', sync);
   doc.addEventListener('diy-journal:replay-intro', replay);

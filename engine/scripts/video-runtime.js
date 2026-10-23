@@ -110,7 +110,7 @@ function watchJournalVideos(win=window) {
   const doc=win.document,base='/api/skin-center/v2/skins/diy-journal/assets/';
   let stop=null,pending=null,generation=0,closed=false;
   async function sync(){
-    const active=doc.documentElement.getAttribute('data-dsh-skin')==='diy-journal';
+    const active=!doc.body?.hasAttribute('data-we-wallpaper')&&(doc.documentElement.getAttribute('data-dsh-skin')==='diy-journal'||doc.body?.hasAttribute('data-dsh-diy-journal-rendering'));
     if(!active){generation++;pending?.abort();pending=null;stop?.();stop=null;return}
     if(stop||pending||closed)return;
     const epoch=++generation;pending=new win.AbortController();const signal=pending.signal;
@@ -128,5 +128,6 @@ function watchJournalVideos(win=window) {
     }catch(error){if(error.name!=='AbortError')console.warn('[DIY video]',error.message)}finally{if(epoch===generation)pending=null}
   }
   const observer=new win.MutationObserver(sync);observer.observe(doc.documentElement,{attributes:true,attributeFilter:['data-dsh-skin']});sync();
+  if(doc.body)observer.observe(doc.body,{attributes:true,attributeFilter:['data-dsh-diy-journal-rendering','data-we-wallpaper']});
   return ()=>{closed=true;generation++;observer.disconnect();pending?.abort();stop?.()};
 }

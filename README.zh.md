@@ -6,7 +6,7 @@
 
 为了贴合手账本自由拼贴的特性，本插件将 **DIY 手账本皮肤 1.14.3 与样式菜单** 放在同一个安装包中。你可以在 **设置 → DIY 手账本** 应用皮肤、打开菜单，调整各个位置的布局与样式、更换图片，搭配胶带、白边和题字，组装属于自己的手账本。
 
-[下载插件 1.2.0](https://github.com/Alphazerolan/diy-journal-settings/releases/tag/v1.2.0) ·
+[下载插件 1.3.0](https://github.com/Alphazerolan/diy-journal-settings/releases/tag/v1.3.0) ·
 [纯皮肤版本与组件展示](https://github.com/Alphazerolan/diy-journal-skin) ·
 [更新记录](CHANGELOG.md)
 
@@ -96,7 +96,7 @@
 从上方下载入口取得 `.tgz` 文件，再通过标准插件管理方式安装，例如桌面档案：
 
 ```powershell
-dsh plugin --profile desktop add "C:/Downloads/alphazerolan-dsh-plugin-diy-journal-1.2.0.tgz"
+dsh plugin --profile desktop add "C:/Downloads/alphazerolan-dsh-plugin-diy-journal-1.3.0.tgz"
 ```
 
 Web 用户将 `desktop` 换成 `web`。完全退出并重启对应 DSH 实例，打开

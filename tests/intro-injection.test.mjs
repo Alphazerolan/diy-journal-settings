@@ -30,6 +30,8 @@ test('only the persisted active journal with a video injects; errors leave boot 
     assert.equal(introRows(skin).length, 1);
     writeFileSync(settings, '{bad'); assert.deepEqual(introRows(skin), []);
     rmSync(settings);
+    writeFileSync(state, JSON.stringify({ active: 'diy-journal-plugin' }));
+    assert.match(introRows(skin)[0].text, /early: true, delegated: true/);
     writeFileSync(state, JSON.stringify({ active: 'other' }));
     assert.deepEqual(introRows(skin), []);
     writeFileSync(state, '{bad'); assert.deepEqual(introRows(skin), []);

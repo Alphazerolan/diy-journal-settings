@@ -11,7 +11,7 @@ skin 1.14.3 and its style menu** in one installation. Use **Settings > DIY Journ
 to apply it, adjust layouts and styles in each area, replace images, and combine
 tape, photo borders and captions to make the journal your own.
 
-[Download plugin 1.2.0](https://github.com/Alphazerolan/diy-journal-settings/releases/tag/v1.2.0) ·
+[Download plugin 1.3.0](https://github.com/Alphazerolan/diy-journal-settings/releases/tag/v1.3.0) ·
 [Standalone skin and component gallery](https://github.com/Alphazerolan/diy-journal-skin) ·
 [Changelog](CHANGELOG.md)
 
@@ -103,7 +103,7 @@ User messages use blue grid-paper notes. DeepSeek replies use lined paper with a
 Download the `.tgz` from the link above and install it with the standard plugin manager:
 
 ```powershell
-dsh plugin --profile desktop add "C:/Downloads/alphazerolan-dsh-plugin-diy-journal-1.2.0.tgz"
+dsh plugin --profile desktop add "C:/Downloads/alphazerolan-dsh-plugin-diy-journal-1.3.0.tgz"
 ```
 
 Use `web` instead of `desktop` for Web profiles. Fully restart that DSH instance.

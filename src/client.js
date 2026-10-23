@@ -12,7 +12,11 @@ window.__ModuleLoader__.load({
       React.useEffect(() => {
         const report = event => setMessage(event.detail);
         document.addEventListener('diy-journal:intro-status', report);
-        return () => document.removeEventListener('diy-journal:intro-status', report);
+        document.addEventListener('diy-journal:render-error', report);
+        return () => {
+          document.removeEventListener('diy-journal:intro-status', report);
+          document.removeEventListener('diy-journal:render-error', report);
+        };
       }, []);
       const [skin, setSkin] = React.useState(null);
       const [center, setCenter] = React.useState(null);
@@ -69,7 +73,7 @@ window.__ModuleLoader__.load({
         boxShadow: '0 3px 10px #526c8012', maxWidth: 720
       };
       return h('section', { style: card, 'aria-label': 'DIY 手账本设置', id: 'diy-journal-settings-panel' },
-        h('style', null, 'html[data-dsh-skin="diy-journal"] [data-shortcut-modal="settings"]:has(#diy-journal-settings-panel){--cg-settings-section-title:"DIY 手账本"!important;}html[data-dsh-skin="diy-journal"] [data-shortcut-modal="settings"]:has(#diy-journal-settings-panel) .wCInkW_options::after{content:none!important;display:none!important;}'),
+        h('style', null, ':is(html[data-dsh-skin="diy-journal"],html:has(> body[data-dsh-diy-journal-rendering])) [data-shortcut-modal="settings"]:has(#diy-journal-settings-panel){--cg-settings-section-title:"DIY 手账本"!important;}:is(html[data-dsh-skin="diy-journal"],html:has(> body[data-dsh-diy-journal-rendering])) [data-shortcut-modal="settings"]:has(#diy-journal-settings-panel) .wCInkW_options::after{content:none!important;display:none!important;}'),
         h('div', { style: {fontSize: 28, fontFamily: 'KaiTi, STKaiti, cursive', marginBottom: 8} }, 'DIY 手账本'),
         h('p', null, '选照片、换胶带，拼出你的手账页面。'),
         h('p', { style: {fontSize: 14} }, skin
@@ -81,8 +85,8 @@ window.__ModuleLoader__.load({
           '请先安装并启用 DSH 皮肤中心，然后重新打开此页。皮肤外观由皮肤中心统一加载。'),
         center && h('div', { style: {display: 'flex', gap: 12, marginBottom: 16, flexWrap: 'wrap'} },
           h('button', { type: 'button', disabled: busy || !skin,
-            onClick: () => selectSkin('diy-journal'), style: {padding: '8px 16px', font: 'inherit', color: '#315b73', background: '#fffdf5', border: '1px solid #b7cbd1', borderRadius: 7, cursor: 'pointer'} },
-            center.active === 'diy-journal' ? '重新应用手账本' : '应用手账本')),
+            onClick: () => selectSkin(center.active === 'diy-journal-plugin' ? 'diy-journal-plugin' : 'diy-journal'), style: {padding: '8px 16px', font: 'inherit', color: '#315b73', background: '#fffdf5', border: '1px solid #b7cbd1', borderRadius: 7, cursor: 'pointer'} },
+            ['diy-journal', 'diy-journal-plugin'].includes(center.active) ? '重新应用手账本' : '应用手账本')),
         h('p', { style: {fontSize: 14} }, '在样式菜单中调整照片布局、位置、角度、白边与题字，实时查看各区域效果。'),
         h('button', { type: 'button', disabled: busy, onClick: openMenu,
           style: {background: '#237fab', color: '#fff', border: '1px solid #237fab',
@@ -99,6 +103,7 @@ window.__ModuleLoader__.load({
     return {
       inject: ['slots'],
       apply(ctx) {
+        ctx.effect(() => watchDelegatedJournal());
         ctx.effect(() => watchSkin(defineSkinHooks));
         ctx.effect(() => watchJournalIntro(window, { manualOnly: true }));
         ctx.effect(() => watchJournalVideos(window));

@@ -1,6 +1,9 @@
 # Changelog / 更新记录
 
-## Unreleased / 未发布
+## 1.3.0 — 2026-10-24
+
+- 增加插件皮肤交接支持：独立描述文件、明确选中后绘制、切换后释放样式与媒体。官方选中信号及卡片注册仍待接入；旧版皮肤中心继续使用原资源皮肤路径。修正插件接管后的图片与字体路径，并让旧式插件皮肤正确让路。详见 [接入状态](docs/DELEGATED-SKIN.md)。
+- Prepare delegated-skin handoff with an independent descriptor, explicit-selection rendering and style/media cleanup. Upstream selection signaling and registration are pending; older centers retain the asset-skin path. See [integration status](docs/DELEGATED-SKIN.md).
 
 - 移除插件设置页重复的“使用官方默认”按钮，切换或恢复默认皮肤统一使用 DSH 皮肤中心；保留重新应用手账本与两种图片恢复功能。
 - Remove the duplicate default-skin button from plugin settings; use DSH Skin Center to switch or restore skins. Keep journal reapplication and both artwork restore actions.

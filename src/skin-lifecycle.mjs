@@ -1,11 +1,12 @@
-// Rendering stays with skin-center. Only supply the bundled state projector
-// when the asset-only install has no trusted market hook activation.
+// Supply the state projector for the asset or delegated renderer,
+// without duplicating an existing trusted market hook activation.
 export function watchSkin(createHooks, win = window) {
   const doc = win.document;
   let cleanup = null, stopped = false;
   function sync() {
     if (stopped) return;
-    const active = doc.documentElement.getAttribute('data-dsh-skin') === 'diy-journal';
+    const active = !doc.body?.hasAttribute('data-we-wallpaper') &&
+      (doc.documentElement.getAttribute('data-dsh-skin') === 'diy-journal' || doc.body?.hasAttribute('data-dsh-diy-journal-rendering'));
     if (!active) { cleanup?.(); cleanup = null; return; }
     if (cleanup || win.__cgStateBooted) return;
     const callbacks = [];
@@ -25,6 +26,7 @@ export function watchSkin(createHooks, win = window) {
   const schedule = () => { win.clearTimeout(timer); timer = win.setTimeout(sync, 0); };
   const observer = new win.MutationObserver(schedule);
   observer.observe(doc.documentElement, { attributes: true, attributeFilter: ['data-dsh-skin'] });
+  if (doc.body) observer.observe(doc.body, { attributes: true, attributeFilter: ['data-dsh-diy-journal-rendering', 'data-we-wallpaper'] });
   schedule();
   return () => { stopped = true; observer.disconnect(); win.clearTimeout(timer); cleanup?.(); cleanup = null; };
 }

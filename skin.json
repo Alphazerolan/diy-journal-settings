@@ -1,0 +1,14 @@
+{
+  "id": "diy-journal-plugin",
+  "name": "DIY 手账本 · 插件版",
+  "nameEn": "DIY Journal · Plugin Edition",
+  "package": "@alphazerolan/dsh-plugin-diy-journal",
+  "repository": "https://github.com/Alphazerolan/diy-journal-settings",
+  "bodyAttr": "data-dsh-diy-journal",
+  "handoffAttr": "data-dsh-diy-journal-handoff",
+  "selectionAttr": "data-dsh-delegated-skin",
+  "wiring": {
+    "id": "ui-diy-journal"
+  },
+  "selectionMode": "explicit"
+}

@@ -17,7 +17,7 @@ function defineSkinHooks() {
     apply(ctx) {
       const SKIN = 'diy-journal';
         const root = document.documentElement;
-        const isOurs = () => root.getAttribute('data-dsh-skin') === SKIN;
+        const isOurs = () => (root.getAttribute('data-dsh-skin') === SKIN || document.body?.hasAttribute('data-dsh-diy-journal-rendering')) && !document.body?.hasAttribute('data-we-wallpaper');
 
         const ROW_SEL = '[role="treeitem"], [class*="projectRow"], [class*="sessionRow"], [class*="chatRow"], [class*="threadRow"]';
         const SEL_RE = /(^|[_\- ])(active|selected|current|focus|chosen)([_\- ]|$)/i;
@@ -243,14 +243,15 @@ function defineSkinHooks() {
   };
 }
 
-// Rendering stays with skin-center. Only supply the bundled state projector
-// when the asset-only install has no trusted market hook activation.
+// Supply the state projector for the asset or delegated renderer,
+// without duplicating an existing trusted market hook activation.
 function watchSkin(createHooks, win = window) {
   const doc = win.document;
   let cleanup = null, stopped = false;
   function sync() {
     if (stopped) return;
-    const active = doc.documentElement.getAttribute('data-dsh-skin') === 'diy-journal';
+    const active = !doc.body?.hasAttribute('data-we-wallpaper') &&
+      (doc.documentElement.getAttribute('data-dsh-skin') === 'diy-journal' || doc.body?.hasAttribute('data-dsh-diy-journal-rendering'));
     if (!active) { cleanup?.(); cleanup = null; return; }
     if (cleanup || win.__cgStateBooted) return;
     const callbacks = [];
@@ -270,6 +271,7 @@ function watchSkin(createHooks, win = window) {
   const schedule = () => { win.clearTimeout(timer); timer = win.setTimeout(sync, 0); };
   const observer = new win.MutationObserver(schedule);
   observer.observe(doc.documentElement, { attributes: true, attributeFilter: ['data-dsh-skin'] });
+  if (doc.body) observer.observe(doc.body, { attributes: true, attributeFilter: ['data-dsh-diy-journal-rendering', 'data-we-wallpaper'] });
   schedule();
   return () => { stopped = true; observer.disconnect(); win.clearTimeout(timer); cleanup?.(); cleanup = null; };
 }
@@ -284,12 +286,21 @@ function watchJournalIntro(win = window, options = {}) {
     win.__diyJournalIntroStatus = text;
     doc.dispatchEvent(new win.CustomEvent('diy-journal:intro-status', { detail: text }));
   };
-  let stopPlayback = null, stopped = false, manual = false;
+  let stopPlayback = null, stopped = false, manual = false, sawPainting = false, observedBody = null;
   const reduced = win.matchMedia('(prefers-reduced-motion: reduce)');
+  const painting = () => !doc.body?.hasAttribute?.('data-we-wallpaper') &&
+    (doc.documentElement.getAttribute('data-dsh-skin') === 'diy-journal' || doc.body?.hasAttribute?.('data-dsh-diy-journal-rendering'));
   function sync() {
     if (stopped) return;
+    if (doc.body && doc.body !== observedBody) {
+      observedBody = doc.body;
+      observer.observe(observedBody, { attributes: true, attributeFilter: ['data-dsh-diy-journal-rendering', 'data-we-wallpaper'] });
+    }
     const skin = doc.documentElement.getAttribute('data-dsh-skin');
-    if (skin !== 'diy-journal' && !(options.early && !skin && !manual)) {
+    if (painting()) sawPainting = true;
+    const waiting = options.early && !sawPainting && (!skin || (options.delegated && skin === 'diy-journal-plugin')) && !manual && !doc.body?.hasAttribute?.('data-we-wallpaper') &&
+      (!options.delegated || doc.documentElement.getAttribute('data-dsh-delegated-skin') === 'diy-journal-plugin');
+    if (!painting() && !waiting) {
       stopPlayback?.(); return;
     }
     if (options.manualOnly && !manual) return;
@@ -318,7 +329,7 @@ function watchJournalIntro(win = window, options = {}) {
     if (options.early && !manual) { layer.style.visibility = 'visible'; layer.style.opacity = '1'; }
     let done = false, frame = null, shown = false, objectUrl = null, fadeStart = null;
     const needsReady = options.early && !manual;
-    const ready = () => !needsReady || (doc.documentElement.getAttribute('data-dsh-skin') === 'diy-journal'
+    const ready = () => !needsReady || (painting()
       && !doc.querySelector('[data-dsh-boot]') && !!doc.querySelector('#root > *'));
     const request = new win.AbortController();
     const previousFocus = doc.activeElement;
@@ -390,7 +401,7 @@ function watchJournalIntro(win = window, options = {}) {
   const replay = () => {
     stopPlayback?.(); manual = true; win[key] = false; sync();
   };
-  observer.observe(doc.documentElement, { attributes: true, attributeFilter: ['data-dsh-skin'] });
+  observer.observe(doc.documentElement, { attributes: true, attributeFilter: ['data-dsh-skin', 'data-dsh-delegated-skin'] });
   doc.addEventListener('DOMContentLoaded', sync, { once: true });
   doc.addEventListener('visibilitychange', sync);
   doc.addEventListener('diy-journal:replay-intro', replay);
@@ -519,7 +530,7 @@ function watchJournalVideos(win=window) {
   const doc=win.document,base='/api/skin-center/v2/skins/diy-journal/assets/';
   let stop=null,pending=null,generation=0,closed=false;
   async function sync(){
-    const active=doc.documentElement.getAttribute('data-dsh-skin')==='diy-journal';
+    const active=!doc.body?.hasAttribute('data-we-wallpaper')&&(doc.documentElement.getAttribute('data-dsh-skin')==='diy-journal'||doc.body?.hasAttribute('data-dsh-diy-journal-rendering'));
     if(!active){generation++;pending?.abort();pending=null;stop?.();stop=null;return}
     if(stop||pending||closed)return;
     const epoch=++generation;pending=new win.AbortController();const signal=pending.signal;
@@ -537,7 +548,89 @@ function watchJournalVideos(win=window) {
     }catch(error){if(error.name!=='AbortError')console.warn('[DIY video]',error.message)}finally{if(epoch===generation)pending=null}
   }
   const observer=new win.MutationObserver(sync);observer.observe(doc.documentElement,{attributes:true,attributeFilter:['data-dsh-skin']});sync();
+  if(doc.body)observer.observe(doc.body,{attributes:true,attributeFilter:['data-dsh-diy-journal-rendering','data-we-wallpaper']});
   return ()=>{closed=true;generation++;observer.disconnect();pending?.abort();stop?.()};
+}
+
+// Skin Center owns the selection stamp; this plugin only reads it.
+// Older centers without this signal keep using the existing asset-skin path.
+function delegatedJournalCSS(css) {
+  const stamp = /\[data-dsh-skin\s*=\s*(?:"diy-journal"|'diy-journal'|diy-journal)\s*\]/g;
+  if (typeof css !== 'string' || !stamp.test(css)) throw new Error('Skin Center returned unscoped journal CSS');
+  stamp.lastIndex = 0;
+  // Inline sheets resolve relative URLs against the document, unlike the
+  // center's stylesheet links. Preserve quotes/escapes and rebase our assets.
+  return css.replace(stamp, ':has(> body[data-dsh-diy-journal-rendering])')
+    .replace(/url\(\s*(?:(["'])(.*?)\1|([^'"\s)]+))\s*\)/gi, (whole, quote, quoted, plain) => {
+      const path = quoted ?? plain;
+      if (!/^(?:\.\/)?assets\//.test(path)) return whole;
+      const q = quote || '';
+      return 'url(' + q + '/api/skin-center/v2/skins/diy-journal/' + path.replace(/^\.\//, '') + q + ')';
+    });
+}
+
+function watchDelegatedJournal(win = window) {
+  const doc = win.document;
+  const selection = 'data-dsh-delegated-skin';
+  const live = 'data-dsh-diy-journal';
+  const handoff = 'data-dsh-diy-journal-handoff';
+  const rendering = 'data-dsh-diy-journal-rendering';
+  const endpoint = '/api/skin-center/v2/skins/diy-journal/';
+  let closed = false, epoch = 0, request = null, styles = [], body = null, failed = false;
+  const selected = () => doc.documentElement.getAttribute(selection) === 'diy-journal-plugin'
+    && [null, 'diy-journal-plugin'].includes(doc.documentElement.getAttribute('data-dsh-skin'))
+    && !doc.body?.hasAttribute('data-we-wallpaper');
+  function release() {
+    epoch++; request?.abort(); request = null;
+    body?.removeAttribute(rendering);
+    styles.forEach(node => node.remove()); styles = [];
+  }
+  function advertise() {
+    if (!doc.body || doc.body === body) return;
+    if (body) { release(); body.removeAttribute(live); body.removeAttribute(handoff); }
+    body = doc.body;
+    body.setAttribute(live, '1'); body.setAttribute(handoff, '1');
+    observer.observe(body, { attributes: true, attributeFilter: ['data-we-wallpaper'] });
+  }
+  async function sync() {
+    if (closed) return;
+    advertise();
+    if (!selected() || !body) { release(); failed = false; return; }
+    if (styles.length || request || failed) return;
+    const generation = ++epoch;
+    const controller = request = new win.AbortController();
+    try {
+      // Reuse Skin Center's sanitizer and asset URLs, never raw user CSS.
+      const texts = await Promise.all(['stylesheet', 'patches'].map(async part => {
+        const response = await win.fetch(endpoint + part, { credentials: 'same-origin', signal: controller.signal, cache: 'no-store' });
+        if (!response.ok) throw new Error('Cannot load journal ' + part);
+        return delegatedJournalCSS(await response.text());
+      }));
+      if (closed || epoch !== generation || !selected()) return;
+      const nodes = texts.map((text, i) => {
+        const node = doc.createElement('style');
+        node.setAttribute('data-diy-delegated-style', String(i)); node.textContent = text; return node;
+      });
+      // Prepare both sheets before enabling their shared scope.
+      styles = nodes; doc.head.append(...nodes);
+      body.setAttribute(rendering, '');
+    } catch (error) {
+      if (!closed && epoch === generation && error.name !== 'AbortError') {
+        release(); failed = true;
+        doc.dispatchEvent(new win.CustomEvent('diy-journal:render-error', { detail: '手账本外观加载失败，请重新选择皮肤。' }));
+        win.console?.warn('[DIY Journal] Delegated skin unavailable:', error);
+      }
+    } finally { if (epoch === generation) request = null; }
+  }
+  const observer = new win.MutationObserver(sync);
+  observer.observe(doc.documentElement, { attributes: true, attributeFilter: [selection, 'data-dsh-skin'], childList: true });
+  doc.addEventListener('DOMContentLoaded', sync);
+  sync();
+  return () => {
+    if (closed) return;
+    closed = true; observer.disconnect(); doc.removeEventListener('DOMContentLoaded', sync);
+    release(); body?.removeAttribute(live); body?.removeAttribute(handoff);
+  };
 }
 
     const React = require('react');
@@ -550,7 +643,11 @@ function watchJournalVideos(win=window) {
       React.useEffect(() => {
         const report = event => setMessage(event.detail);
         document.addEventListener('diy-journal:intro-status', report);
-        return () => document.removeEventListener('diy-journal:intro-status', report);
+        document.addEventListener('diy-journal:render-error', report);
+        return () => {
+          document.removeEventListener('diy-journal:intro-status', report);
+          document.removeEventListener('diy-journal:render-error', report);
+        };
       }, []);
       const [skin, setSkin] = React.useState(null);
       const [center, setCenter] = React.useState(null);
@@ -607,7 +704,7 @@ function watchJournalVideos(win=window) {
         boxShadow: '0 3px 10px #526c8012', maxWidth: 720
       };
       return h('section', { style: card, 'aria-label': 'DIY 手账本设置', id: 'diy-journal-settings-panel' },
-        h('style', null, 'html[data-dsh-skin="diy-journal"] [data-shortcut-modal="settings"]:has(#diy-journal-settings-panel){--cg-settings-section-title:"DIY 手账本"!important;}html[data-dsh-skin="diy-journal"] [data-shortcut-modal="settings"]:has(#diy-journal-settings-panel) .wCInkW_options::after{content:none!important;display:none!important;}'),
+        h('style', null, ':is(html[data-dsh-skin="diy-journal"],html:has(> body[data-dsh-diy-journal-rendering])) [data-shortcut-modal="settings"]:has(#diy-journal-settings-panel){--cg-settings-section-title:"DIY 手账本"!important;}:is(html[data-dsh-skin="diy-journal"],html:has(> body[data-dsh-diy-journal-rendering])) [data-shortcut-modal="settings"]:has(#diy-journal-settings-panel) .wCInkW_options::after{content:none!important;display:none!important;}'),
         h('div', { style: {fontSize: 28, fontFamily: 'KaiTi, STKaiti, cursive', marginBottom: 8} }, 'DIY 手账本'),
         h('p', null, '选照片、换胶带，拼出你的手账页面。'),
         h('p', { style: {fontSize: 14} }, skin
@@ -619,8 +716,8 @@ function watchJournalVideos(win=window) {
           '请先安装并启用 DSH 皮肤中心，然后重新打开此页。皮肤外观由皮肤中心统一加载。'),
         center && h('div', { style: {display: 'flex', gap: 12, marginBottom: 16, flexWrap: 'wrap'} },
           h('button', { type: 'button', disabled: busy || !skin,
-            onClick: () => selectSkin('diy-journal'), style: {padding: '8px 16px', font: 'inherit', color: '#315b73', background: '#fffdf5', border: '1px solid #b7cbd1', borderRadius: 7, cursor: 'pointer'} },
-            center.active === 'diy-journal' ? '重新应用手账本' : '应用手账本')),
+            onClick: () => selectSkin(center.active === 'diy-journal-plugin' ? 'diy-journal-plugin' : 'diy-journal'), style: {padding: '8px 16px', font: 'inherit', color: '#315b73', background: '#fffdf5', border: '1px solid #b7cbd1', borderRadius: 7, cursor: 'pointer'} },
+            ['diy-journal', 'diy-journal-plugin'].includes(center.active) ? '重新应用手账本' : '应用手账本')),
         h('p', { style: {fontSize: 14} }, '在样式菜单中调整照片布局、位置、角度、白边与题字，实时查看各区域效果。'),
         h('button', { type: 'button', disabled: busy, onClick: openMenu,
           style: {background: '#237fab', color: '#fff', border: '1px solid #237fab',
@@ -637,6 +734,7 @@ function watchJournalVideos(win=window) {
     return {
       inject: ['slots'],
       apply(ctx) {
+        ctx.effect(() => watchDelegatedJournal());
         ctx.effect(() => watchSkin(defineSkinHooks));
         ctx.effect(() => watchJournalIntro(window, { manualOnly: true }));
         ctx.effect(() => watchJournalVideos(window));

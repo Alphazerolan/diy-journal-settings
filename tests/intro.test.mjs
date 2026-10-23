@@ -9,6 +9,7 @@ function environment({ skin = 'diy-journal', reduced = false } = {}) {
     style = {}; children = []; isConnected = true; currentTime = 0;
     setAttribute(name, value) { this[name] = value; }
     removeAttribute(name) { delete this[name]; }
+    hasAttribute(name) { return Object.hasOwn(this, name); }
     append(...items) { items.forEach(item => { item.parent = this; this.children.push(item); }); }
     remove() { this.isConnected = false; this.parent.children = this.parent.children.filter(x => x !== this); }
     focus() { doc.activeElement = this; }
@@ -17,7 +18,8 @@ function environment({ skin = 'diy-journal', reduced = false } = {}) {
     play() { return Promise.resolve(); }
   }
   const doc = new EventTarget();
-  doc.body = new Element(); doc.documentElement = { getAttribute: () => skin };
+  let delegated = null;
+  doc.body = new Element(); doc.documentElement = { getAttribute: name => name === 'data-dsh-skin' ? skin : name === 'data-dsh-delegated-skin' ? delegated : null };
   doc.activeElement = new Element(); doc.createElement = () => new Element();
   doc.querySelector = selector => selector === '[data-dsh-boot]'
     ? (loading ? { querySelector: () => failed ? null : {} } : null) : (loading ? null : {});
@@ -32,10 +34,35 @@ function environment({ skin = 'diy-journal', reduced = false } = {}) {
     MutationObserver: class { constructor(fn) { mutation = fn; } observe() {} disconnect() { mutation = null; } }
   };
   return { win, doc, timers, frames, setSkin(value) { skin = value; mutation?.(); },
+    delegated(value) { delegated = value; mutation?.(); },
+    bodyAttr(name, present) { present ? doc.body.setAttribute(name, '') : doc.body.removeAttribute(name); mutation?.(); },
     loading(value, failure = false) { loading = value; failed = failure; },
     layer: () => doc.body.children[0],
     frame(ms = 16) { now += ms; const pending = [...frames.values()]; frames.clear(); pending.forEach(fn => fn(now)); } };
 }
+
+test('delegated intro waits only for its explicit selection and yields on cancellation', () => {
+  for (const reason of ['default', 'other', 'wallpaper', 'render-stopped']) {
+    const env = environment({ skin: null }); env.delegated('diy-journal-plugin');
+    const dispose = watchJournalIntro(env.win, { early: true, delegated: true });
+    assert.ok(env.layer());
+    env.bodyAttr('data-dsh-diy-journal-rendering', true);
+    if (reason === 'wallpaper') env.bodyAttr('data-we-wallpaper', true);
+    else {
+      env.bodyAttr('data-dsh-diy-journal-rendering', false);
+      if (reason === 'default') env.delegated(null);
+      if (reason === 'other') env.delegated('other-plugin');
+    }
+    assert.equal(env.layer(), undefined, reason); dispose();
+  }
+  const env = environment({ skin: null });
+  const dispose = watchJournalIntro(env.win, { early: true, delegated: true });
+  assert.equal(env.layer(), undefined); dispose();
+  env.delegated('diy-journal-plugin');
+  const cancel = watchJournalIntro(env.win, { early: true, delegated: true });
+  assert.ok(env.layer()); env.delegated(null);
+  assert.equal(env.layer(), undefined); cancel();
+});
 
 test('early injection starts before skin stamp and client adopts it without replay', () => {
   const env = environment({ skin: null }); env.loading(true);
@@ -118,4 +145,10 @@ test('skip, media failure, skin switch, timeout and disposal never leave a block
     assert.equal(env.layer(), undefined, reason); assert.equal(env.timers.size, 0, reason);
     dispose();
   }
+});
+
+test('early explicit delegate tolerates its own legacy-peer claim while CSS loads', () => {
+  const env = environment({ skin: 'diy-journal-plugin' }); env.delegated('diy-journal-plugin');
+  const stop = watchJournalIntro(env.win, { early: true, delegated: true });
+  assert.ok(env.layer()); env.setSkin('other'); assert.equal(env.layer(), undefined); stop();
 });
