@@ -47,7 +47,7 @@ This screenshot shows the **actual DSH Web UI with the released 1.2.0 plugin**, 
 
 Open the editor from **Settings > DIY Journal**.
 
-![DIY Journal entry in DSH Settings](docs/images/diy-settings-entry.png)
+![DIY Journal entry in DSH Settings](docs/images/diy-settings-entry-20261024.png)
 
 - **Open folder:** opens the current area's photo directory without changing the selection. Use Choose image or video to select files added there.
 - **Restore current skin photos:** reads the photos currently used in the installed DIY Journal skin for this area and restores them into the editor preview.
