@@ -55,7 +55,7 @@ Open the editor from **Settings > DIY Journal**.
 
 Both restore actions affect the current area only, retaining existing photo files and layout settings. If No photo is selected, restoring an image enables the single-tape layout so it is visible. **The skin changes only after Save and apply**; refresh DSH afterwards.
 
-The screenshot below shows the **running 1.2.0 editor**, including the opening-animation switch, image/video picker, folder access and both restore actions. Automatic startup playback is disabled here to demonstrate that photo-area videos work independently; it is enabled by default on a fresh installation. The skin scene at the bottom of the menu uses static sample content.
+The screenshot below shows the **running editor, refreshed on 2026-10-24**, including the enabled opening-animation switch, image/video picker, folder access, both restore actions and photo layouts. Startup playback is enabled by default and can be turned off independently of photo-area videos. The skin scene at the bottom of the menu uses static sample content.
 
 ![1.2.0 editor with startup-animation switch, image/video selection and restore actions](docs/images/diy-style-menu-v120.png)
 
@@ -136,8 +136,8 @@ and restarting. Do not load both entries. Personal data and the skin are retaine
 - Saving only updates DIY Journal; it never selects it over another active skin.
 - Switching away cleans the plugin's state markers; switching back mounts them.
 - Disabling/uninstalling closes the menu and enhancements, retaining the asset
-  skin and personal data. Select another skin or **Use official default** first
-  to also remove its appearance.
+  skin and personal data. To also remove its appearance, select another skin
+  or restore the default skin in DSH Skin Center.
 
 The menu is loopback-only, with random tokens, origin checks and a 20-minute
 idle timeout. Photos are never uploaded.

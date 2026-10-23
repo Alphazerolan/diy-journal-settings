@@ -1,5 +1,10 @@
 # Changelog / 更新记录
 
+## Unreleased / 未发布
+
+- 移除插件设置页重复的“使用官方默认”按钮，切换或恢复默认皮肤统一使用 DSH 皮肤中心；保留重新应用手账本与两种图片恢复功能。
+- Remove the duplicate default-skin button from plugin settings; use DSH Skin Center to switch or restore skins. Keep journal reapplication and both artwork restore actions.
+
 ## 1.2.0 — 2026-10-23
 
 - 样式菜单增加启动翻书动画开关，保存后生效；关闭自动开场仍可手动重播。
