@@ -232,5 +232,15 @@
   "usage": {
     "en": "The illustrations and character artwork bundled with this skin are for personal, non-commercial use only. Character and other third-party rights remain with their respective holders; this notice grants no third-party rights or official authorization.",
     "zh": "本皮肤随附的插画及角色画面仅限个人非商业使用；角色及其他第三方权利仍归相应权利人，本声明不授予第三方权利或官方授权。"
-  }
+  },
+  "videos": [
+    {
+      "id": "journal-opening-v7",
+      "file": "assets/journal-opening-v7.mp4",
+      "source": "Two videos provided by the user; generator not independently verified.",
+      "editing": "Local montage, timing, fixed-center zoom and size alignment. Fade implemented by the plugin.",
+      "durationSeconds": 5,
+      "sha256": "544b6c013897544ee08852512ad668724e130e89394ea88668eef908cb01cfdb"
+    }
+  ]
 }

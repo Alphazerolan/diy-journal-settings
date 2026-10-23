@@ -9,6 +9,11 @@ window.__ModuleLoader__.load({
       const [busy, setBusy] = React.useState(false);
       const [message, setMessage] = React.useState('');
       const [url, setUrl] = React.useState('');
+      React.useEffect(() => {
+        const report = event => setMessage(event.detail);
+        document.addEventListener('diy-journal:intro-status', report);
+        return () => document.removeEventListener('diy-journal:intro-status', report);
+      }, []);
       const [skin, setSkin] = React.useState(null);
       const [center, setCenter] = React.useState(null);
       React.useEffect(() => {
@@ -85,6 +90,8 @@ window.__ModuleLoader__.load({
           style: {background: '#237fab', color: '#fff', border: '1px solid #237fab',
             borderRadius: 7, padding: '10px 20px', font: 'inherit', cursor: busy ? 'wait' : 'pointer'} },
           busy ? '正在打开…' : '打开样式菜单'),
+        h('button', { type: 'button', onClick: () => document.dispatchEvent(new Event('diy-journal:replay-intro')),
+          style: { marginLeft: 12, padding: '10px 16px', font: 'inherit', color: '#315b73', background: '#fffdf5', border: '1px solid #b7cbd1', borderRadius: 7, cursor: 'pointer' } }, '重播开场动画'),
         h('p', { style: {fontSize: 13, color: '#647f8e'} }, '菜单需要 Python 3.9+，会自动检测。完成后点击“保存并应用”，再刷新 Harness 查看效果。'),
         h('p', { role: 'status', style: {fontSize: 14} }, message),
         url && h('a', { href: url, target: '_blank', rel: 'noopener noreferrer',
@@ -95,6 +102,7 @@ window.__ModuleLoader__.load({
       inject: ['slots'],
       apply(ctx) {
         ctx.effect(() => watchSkin(defineSkinHooks));
+        ctx.effect(() => watchJournalIntro(window, { manualOnly: true }));
         ctx.slots.inject('settings.section', () => ctx.slots.register({
           name: 'settings.section', id: 'diy-journal', order: 10000,
           label: () => 'DIY 手账本'

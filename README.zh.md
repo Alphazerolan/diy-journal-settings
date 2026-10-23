@@ -6,7 +6,7 @@
 
 为了贴合手账本自由拼贴的特性，本插件将 **DIY 手账本皮肤 1.14.3 与样式菜单** 放在同一个安装包中。你可以在 **设置 → DIY 手账本** 应用皮肤、打开菜单，调整各个位置的布局与样式、更换图片，搭配胶带、白边和题字，组装属于自己的手账本。
 
-[下载插件 1.1.2](https://github.com/Alphazerolan/diy-journal-settings/releases/tag/v1.1.2) ·
+[下载插件 1.1.3](https://github.com/Alphazerolan/diy-journal-settings/releases/tag/v1.1.3) ·
 [纯皮肤版本与组件展示](https://github.com/Alphazerolan/diy-journal-skin) ·
 [更新记录](CHANGELOG.md)
 
@@ -80,7 +80,7 @@
 从上方下载入口取得 `.tgz` 文件，再通过标准插件管理方式安装，例如桌面档案：
 
 ```powershell
-dsh plugin --profile desktop add "C:/Downloads/alphazerolan-dsh-plugin-diy-journal-1.1.2.tgz"
+dsh plugin --profile desktop add "C:/Downloads/alphazerolan-dsh-plugin-diy-journal-1.1.3.tgz"
 ```
 
 Web 用户将 `desktop` 换成 `web`。完全退出并重启对应 DSH 实例，打开
@@ -131,3 +131,9 @@ npm pack
 `client.js` 从 `src/` 和随包状态投影逻辑生成。原皮肤来源审查机制保持不变；
 插件只运行随插件发布的代码，不加载用户皮肤目录中的任意脚本。
 代码 MIT；素材条款见 [NOTICE](NOTICE) 和 [皮肤声明](skin/NOTICE)。
+
+### 翻书开场动画
+
+启用 DIY 手账本时，通过 DSH 的页面早期注入播放 5 秒翻书动画，与客户端插件加载并行。主界面准备好后淡出；若视频先结束，则暂留收尾画面等待，超时或失败时返回原加载界面。客户端不再额外自动播放第二次。可点击“跳过动画”或按 Esc；在设置 → DIY 手账本中可重播。尊重系统“减少动画”偏好。此功能由插件提供，纯皮肤包不包含播放器。
+
+此接入发生在宿主提供启动注入内容之后，不能覆盖 Electron 或宿主自身更早的启动阶段。早期注入已通过浏览器验证，作者已在本机确认启动效果。

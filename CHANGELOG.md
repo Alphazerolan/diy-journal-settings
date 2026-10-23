@@ -1,5 +1,12 @@
 # Changelog / 更新记录
 
+## 1.1.3 — 2026-10-23
+
+- 开场提前到宿主页面注入阶段，与客户端加载并行；等待主界面就绪后淡出，取消客户端重复自动播放，超时及错误回退至原加载界面。浏览器检查通过，作者已确认本机启动效果。
+- Start the intro through host page injections alongside client boot, wait for the UI before fading, remove duplicate late autoplay, and release the native loader on errors/timeouts. Browser verified; desktop startup appearance confirmed by the author.
+- 接入 5 秒手账翻页开场，末尾淡出进入真实界面；设置页可重播，支持跳过及减少动画偏好。
+- Add a five-second journal opening, fading into the live UI, with replay, skip and reduced-motion support.
+
 ## 1.1.2 — 2026-10-22
 
 - 图片操作增加“打开文件夹”，直接打开当前区域目录，不改变当前选图。

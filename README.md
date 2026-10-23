@@ -11,7 +11,7 @@ skin 1.14.3 and its style menu** in one installation. Use **Settings > DIY Journ
 to apply it, adjust layouts and styles in each area, replace images, and combine
 tape, photo borders and captions to make the journal your own.
 
-[Download plugin 1.1.2](https://github.com/Alphazerolan/diy-journal-settings/releases/tag/v1.1.2) ·
+[Download plugin 1.1.3](https://github.com/Alphazerolan/diy-journal-settings/releases/tag/v1.1.3) ·
 [Standalone skin and component gallery](https://github.com/Alphazerolan/diy-journal-skin) ·
 [Changelog](CHANGELOG.md)
 
@@ -87,7 +87,7 @@ User messages use blue grid-paper notes. DeepSeek replies use lined paper with a
 Download the `.tgz` from the link above and install it with the standard plugin manager:
 
 ```powershell
-dsh plugin --profile desktop add "C:/Downloads/alphazerolan-dsh-plugin-diy-journal-1.1.2.tgz"
+dsh plugin --profile desktop add "C:/Downloads/alphazerolan-dsh-plugin-diy-journal-1.1.3.tgz"
 ```
 
 Use `web` instead of `desktop` for Web profiles. Fully restart that DSH instance.
@@ -145,3 +145,9 @@ npm pack
 provenance checks stay intact. Only code shipped in this plugin is executed,
 never arbitrary scripts from the user's skin directory.
 Code is MIT; asset terms are in [NOTICE](NOTICE) and [skin/NOTICE](skin/NOTICE).
+
+### Journal opening animation
+
+With DIY Journal active, DSH's early page injections start the five-second opening alongside client plugin loading. It fades out once the live UI is ready; if the video ends first, its last frame remains briefly while loading continues. Timeouts and failures release the normal loading screen. The ordinary client no longer starts a second automatic playback. Skip with the on-screen button or Escape; replay from Settings → DIY Journal. Reduced-motion preferences are respected. Playback is provided by this plugin, not the standalone skin package.
+
+This starts after the host supplies its boot injections, so it cannot cover earlier Electron or host startup. The early-injection version has passed browser checks, and the author has confirmed the startup appearance on their desktop.

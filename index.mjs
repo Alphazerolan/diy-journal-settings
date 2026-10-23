@@ -4,6 +4,7 @@ import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { resolve, dirname, join } from 'node:path';
 import { paths, provision, findPython, prepareEditor } from './runtime.mjs';
+import { registerIntroInjection } from './src/intro-injection.mjs';
 
 export const name = 'diy-journal-settings';
 export const inject = ['webServer'];
@@ -70,6 +71,7 @@ export function createLauncher(python, skinRoot = root, dshHome = null, skinDir 
 
 export function apply(ctx) {
   const locations = paths();
+  registerIntroInjection(ctx, locations.skin);
   let installation, setupError, launcher, opening, disposed = false;
   try { installation = provision(join(root, 'skin'), locations); }
   catch (error) { setupError = error.message; }
