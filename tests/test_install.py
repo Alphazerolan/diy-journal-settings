@@ -14,6 +14,7 @@ class InstallTests(unittest.TestCase):
             shutil.copytree(ROOT/'engine',plugin/'engine');installer.ROOT=plugin
             skin=base/'home/skins/diy-journal';art=skin/'assets/diy-generated';art.mkdir(parents=True)
             (skin/'skin.json').write_text('{"id":"diy-journal"}')
+            (skin/'intro-settings.json').write_text('{"introEnabled":false}')
             uri=base64.b64encode(b'webp-extraction-fixture').decode()
             (art/'home.svg').write_text('<svg xmlns="http://www.w3.org/2000/svg"><image href="data:image/webp;base64,'+uri+'"/></svg>')
             try:
@@ -36,6 +37,7 @@ class InstallTests(unittest.TestCase):
             shutil.copytree(ROOT/'engine',plugin/'engine');installer.ROOT=plugin
             home=base/'home';skin=home/'skins/diy-journal';skin.mkdir(parents=True)
             (skin/'skin.json').write_text('{"id":"diy-journal"}')
+            (skin/'intro-settings.json').write_text('{"introEnabled":false}')
             art=skin/'assets/diy-generated';art.mkdir(parents=True)
             # Only extraction is tested here; rendering is covered by a real package smoke test.
             uri=base64.b64encode(b'sample-image-bytes').decode()
@@ -58,6 +60,7 @@ class InstallTests(unittest.TestCase):
                 self.assertNotIn(installer.START,patch.read_text())
                 self.assertIn('other-plugin',patch.read_text())
                 self.assertTrue((folder/'personal.png').exists())
+                self.assertFalse(json.loads((work/'intro-settings.json').read_text())['introEnabled'])
                 self.assertTrue(list((home/'diy-journal-editor-backups').rglob('cordis.patch.yml')))
             finally:installer.ROOT=original
 

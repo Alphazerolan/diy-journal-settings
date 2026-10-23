@@ -1,5 +1,21 @@
 # Changelog / 更新记录
 
+## 1.2.0 — 2026-10-23
+
+- 样式菜单增加启动翻书动画开关，保存后生效；关闭自动开场仍可手动重播。
+- 照片区域支持导入 MP4、自动生成封面，可与静态图片混排，沿用白边、胶带、题字、位置、角度和缩放。
+- 菜单与实际皮肤共用视频拼贴渲染；默认静音循环，离开可视区域或减少动画时暂停，播放失败显示封面。
+- 更新和恢复现用素材时保留动画偏好、视频与封面信息；内置纯皮肤版本维持 1.14.3。
+
+English:
+
+- Add a persistent global startup-animation switch to the style menu; turning it off skips early injection while keeping manual replay available.
+- Preserve the animation preference through editor preparation and plugin updates.
+- Support MP4 imports with browser validation and poster capture, alongside animated GIF photos.
+- Share the video collage renderer between menu previews, scene previews and the integrated plugin; preserve photo borders, tape, captions, transforms and stacking.
+- Pause offscreen/reduced-motion playback, release video resources on skin switch, and retain posters on playback failure.
+- Restore installed videos with their poster metadata when preparing a new editor or recovering current artwork.
+
 ## 1.1.3 — 2026-10-23
 
 - 开场提前到宿主页面注入阶段，与客户端加载并行；等待主界面就绪后淡出，取消客户端重复自动播放，超时及错误回退至原加载界面。浏览器检查通过，作者已确认本机启动效果。

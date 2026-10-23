@@ -6,12 +6,20 @@
 
 为了贴合手账本自由拼贴的特性，本插件将 **DIY 手账本皮肤 1.14.3 与样式菜单** 放在同一个安装包中。你可以在 **设置 → DIY 手账本** 应用皮肤、打开菜单，调整各个位置的布局与样式、更换图片，搭配胶带、白边和题字，组装属于自己的手账本。
 
-[下载插件 1.1.3](https://github.com/Alphazerolan/diy-journal-settings/releases/tag/v1.1.3) ·
+[下载插件 1.2.0](https://github.com/Alphazerolan/diy-journal-settings/releases/tag/v1.2.0) ·
 [纯皮肤版本与组件展示](https://github.com/Alphazerolan/diy-journal-skin) ·
 [更新记录](CHANGELOG.md)
 
 本仓库由原来的独立样式菜单升级为一体化插件。仅调整 DIY 手账本，
 不是适用于所有皮肤的通用编辑器。只需要外观时，可以继续使用纯皮肤版本。
+
+## 开场动画与动态图片
+
+样式菜单顶部的“启用启动翻书动画”控制自动开场，默认开启。点击“保存并应用”后，下次启动或重新加载 DSH 时生效。关闭自动开场后仍可在 DSH 设置中手动重播；系统开启“减少动画”时自动跳过。
+
+照片区域支持 GIF 动图与 MP4 视频（每个不超过 20 MB）。点击“选择图片或视频”导入 MP4，推荐 H.264 编码；菜单会检查能否播放并生成封面。视频沿用白边、胶带、题字、位置、角度、缩放与双照片前后关系，可混排图片和视频。默认静音循环，离开可视区域或开启系统“减少动画”时暂停；读取失败保留封面。
+
+视频拼贴需要启用本一体化插件，纯皮肤独立使用时显示封面。请通过菜单导入视频；直接把 MP4 放入文件夹不会自动生成封面。开场动画开关仅控制启动翻书，不控制照片区域的视频。
 
 ## 皮肤与 DIY 功能
 
@@ -80,7 +88,7 @@
 从上方下载入口取得 `.tgz` 文件，再通过标准插件管理方式安装，例如桌面档案：
 
 ```powershell
-dsh plugin --profile desktop add "C:/Downloads/alphazerolan-dsh-plugin-diy-journal-1.1.3.tgz"
+dsh plugin --profile desktop add "C:/Downloads/alphazerolan-dsh-plugin-diy-journal-1.2.0.tgz"
 ```
 
 Web 用户将 `desktop` 换成 `web`。完全退出并重启对应 DSH 实例，打开

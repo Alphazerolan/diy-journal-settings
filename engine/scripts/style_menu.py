@@ -4,7 +4,7 @@ from urllib.parse import urlparse, parse_qs
 from pathlib import Path
 import argparse, base64, json, secrets, time, webbrowser, threading, hashlib
 from collections import OrderedDict
-import build, styles, scene_preview, mimetypes, photo_import
+import build, styles, scene_preview, mimetypes, photo_import, video_media
 
 ROOT=build.ROOT
 
@@ -31,7 +31,21 @@ class SceneAssets:
             if data is not None:self.items.move_to_end(key)
             return data
 
-def save_choices(values, apply=True):
+def read_intro_settings():
+    path=ROOT/'intro-settings.json'
+    if not path.exists():return {'introEnabled':True}
+    value=json.loads(path.read_text(encoding='utf-8'))
+    return validate_intro_settings(value)
+
+
+def validate_intro_settings(value):
+    if not isinstance(value,dict) or type(value.get('introEnabled')) is not bool:
+        raise ValueError('开场动画设置必须为开启或关闭。')
+    return {'introEnabled':value['introEnabled']}
+
+
+def save_choices(values, apply=True, settings=None):
+    settings=read_intro_settings() if settings is None else validate_intro_settings(settings)
     slots=json.loads((ROOT/'slots.json').read_text(encoding='utf-8'))
     choices=styles.catalog(ROOT);ids={s['id'] for s in slots}
     if not isinstance(values,dict) or set(values)!=ids:raise ValueError('请为全部 14 个区域选择样式。')
@@ -59,6 +73,10 @@ def save_choices(values, apply=True):
             originals[p]=p.read_bytes() if p.exists() else None;paths.append(p)
             tmp=p.with_suffix('.json.tmp')
             tmp.write_text(json.dumps(styles.config(selections[s['id']],styles.available(ROOT,s,choices),colors[s['id']],swaps[s['id']],patterns[s['id']],adjustments[s['id']],borders[s['id']],fronts[s['id']]),ensure_ascii=False,indent=2)+'\n',encoding='utf-8');tmp.replace(p)
+        p=ROOT/'intro-settings.json'
+        originals[p]=p.read_bytes() if p.exists() else None;paths.append(p)
+        tmp=p.with_suffix('.json.tmp')
+        tmp.write_text(json.dumps(settings)+'\n',encoding='utf-8');tmp.replace(p)
         build.build()
     except Exception:
         for p in paths:
@@ -86,14 +104,18 @@ def main():
             if not isinstance(data,bytes):data=json.dumps(data,ensure_ascii=False).encode('utf-8')
             self.send_response(status);self.send_header('Content-Type',mime)
             self.send_header('Cache-Control','no-store');self.send_header('X-Content-Type-Options','nosniff')
-            self.send_header('Content-Security-Policy',"default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; frame-src 'self' blob:; font-src 'self' data:; frame-ancestors 'none'; base-uri 'none'")
-            self.send_header('Content-Length',str(len(data)));self.end_headers();self.wfile.write(data)
+            self.send_header('Content-Security-Policy',"default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; frame-src 'self' blob:; media-src 'self' blob:; font-src 'self' data:; frame-ancestors 'none'; base-uri 'none'")
+            self.send_header('Content-Length',str(len(data)))
+            try:self.end_headers();self.wfile.write(data)
+            except (ConnectionError,TimeoutError):pass  # A newer preview can cancel this response.
+
         def authorized(self):
             return self.headers.get('Host')==host and secrets.compare_digest(self.headers.get('X-DIY-Token',''),token) and self.headers.get('Origin',origin)==origin
         def do_GET(self):
             path=urlparse(self.path)
             if self.headers.get('Host')!=host:return self.reply(403,{'message':'无效本地地址。'})
             if path.path=='/':return self.reply(200,(ROOT/'scripts/style-menu.html').read_bytes(),'text/html; charset=utf-8')
+            if path.path=='/video-runtime.js':return self.reply(200,(ROOT/'scripts/video-runtime.js').read_bytes(),'text/javascript; charset=utf-8')
             if path.path=='/menu.js':return self.reply(200,(ROOT/'scripts/style-menu.js').read_bytes(),'text/javascript; charset=utf-8')
             if path.path.startswith('/scene-preview/'):
                 parts=path.path.split('/',3)
@@ -124,7 +146,7 @@ def main():
                                         'photos':build.picture_labels(ROOT/'DIY图片'/s['folder']),'swapPhotos':styles.read_swap(ROOT,s),
                                         'allowedStyles':[x['id'] for x in styles.available(ROOT,s)],
                                         'tapeCounts':{str(x['id']):styles.tape_count(ROOT,s,x['id']) for x in styles.available(ROOT,s)},'photo':build.picture_labels(ROOT/'DIY图片'/s['folder'])[0] if picfiles else None})
-                    return self.reply(200,{'regions':regions,'styles':styles.catalog(ROOT),'colors':styles.palettes(ROOT),'patterns':styles.patterns(ROOT)})
+                    return self.reply(200,{'settings':read_intro_settings(),'regions':regions,'styles':styles.catalog(ROOT),'colors':styles.palettes(ROOT),'patterns':styles.patterns(ROOT)})
                 if path.path=='/api/preview':
                     q=parse_qs(path.query);s=slot_map[q['slot'][0]];style_id=int(q['style'][0])
                     if style_id not in {x['id'] for x in styles.available(ROOT,s)}:raise ValueError('该区域不支持此样式')
@@ -138,6 +160,7 @@ def main():
                     borders=styles.validate_borders(json.loads(q['borders'][0])) if 'borders' in q else styles.read_borders(ROOT,s)
                     front=styles.validate_front(q.get('front',[styles.read_front(ROOT,s)])[0])
                     svg=styles.render(ROOT,s,style_id,pic['uri'] if pic else styles.sample_uri(),colors,pics[1]['uri'] if len(pics)>1 else None,swap_value=='1',patterns,adjustments,borders,front)
+                    svg=video_media.decorate(svg,pics,ROOT)
                     return self.reply(200,svg.encode('utf-8'),'image/svg+xml')
                 return self.reply(404,{'message':'页面不存在。'})
             except Exception as e:return self.reply(400,{'message':str(e)})
@@ -146,7 +169,7 @@ def main():
             activity[0]=time.monotonic()
             try:
                 length=int(self.headers.get('Content-Length','0'))
-                limit=photo_import.MAX_IMAGE_BYTES*4//3+4096 if self.path=='/api/photo' else 16384
+                limit=photo_import.MAX_IMAGE_BYTES*4//3+3*1024*1024+4096 if self.path=='/api/photo' else 16384
                 if not 0<length<=limit:raise ValueError('请求大小错误')
                 if self.headers.get('Content-Type')!='application/json':raise ValueError('请求格式错误')
                 payload=json.loads(self.rfile.read(length))
@@ -165,7 +188,8 @@ def main():
                     result=scene_preview.render(ROOT,payload,token,scene_assets.put)
                     return self.reply(200,result.encode('utf-8'),'text/html; charset=utf-8')
                 if self.path=='/api/save':
-                    with save_lock:result=save_choices(payload)
+                    with save_lock:
+                        result=save_choices(payload['choices'],settings=payload.get('settings')) if isinstance(payload,dict) and 'choices' in payload else save_choices(payload)
                     return self.reply(200,result)
                 if self.path=='/api/close':
                     closed[0]=True;return self.reply(200,{'ok':True})

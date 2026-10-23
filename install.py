@@ -1,6 +1,6 @@
 """Install a portable local editor; do not modify application binaries or other skins."""
 from pathlib import Path
-import argparse,base64,datetime,json,os,re,shutil,sys
+import argparse,base64,datetime,json,os,re,shutil,sys,hashlib
 import xml.etree.ElementTree as ET
 
 ROOT=Path(__file__).resolve().parent
@@ -23,7 +23,7 @@ def prepare(home,skin_dir=None):
         for p in folder.rglob('*'):
             if not p.is_file() or '__pycache__' in p.parts:continue
             rel=p.relative_to(folder)
-            if folder==skin and rel.parts[0] not in ('assets','skin.json','skin.css','patches.css','hooks.mjs','NOTICE','README.md','README.zh.md','LICENSE'):continue
+            if folder==skin and rel.parts[0] not in ('assets','skin.json','skin.css','patches.css','hooks.mjs','NOTICE','README.md','README.zh.md','LICENSE','intro-settings.json'):continue
             if p.is_symlink():raise ValueError('Linked files are unsupported.')
             dest=work/rel
             plain(p);plain(dest)
@@ -52,10 +52,21 @@ def prepare(home,skin_dir=None):
             doc=ET.fromstring(svg.read_bytes())
             for el in doc.iter():
                 if el.tag.split('}')[-1]!='image':continue
+                ref=el.get('data-diy-video')
+                if ref:
+                    if not re.fullmatch(r'diy-media/[a-f0-9]{64}\.mp4',ref):raise ValueError('Invalid video reference')
+                    source=skin/'assets'/ref;meta=source.with_name('.'+source.name+'.json');plain(source);plain(meta)
+                    raw=source.read_bytes()
+                    if hashlib.sha256(raw).hexdigest()+'.mp4'!=source.name:raise ValueError('Invalid video checksum')
+                    filename=f'bundled-{len(chosen)+1}.mp4'
+                    (folder/filename).write_bytes(raw);shutil.copy2(meta,folder/('.'+filename+'.json'))
+                    chosen.append({'file':filename,'name':filename})
+                    if len(chosen)==2:break
+                    continue
                 uri=el.get('href',el.get('{http://www.w3.org/1999/xlink}href',''))
-                m=re.fullmatch(r'data:image/(png|jpeg|webp);base64,(.+)',uri,re.S)
+                m=re.fullmatch(r'data:image/(png|jpeg|webp|gif|bmp|svg\+xml);base64,(.+)',uri,re.S)
                 if not m:continue
-                raw=base64.b64decode(m[2],validate=True);ext={'jpeg':'jpg'}.get(m[1],m[1])
+                raw=base64.b64decode(m[2],validate=True);ext={'jpeg':'jpg','svg+xml':'svg'}.get(m[1],m[1])
                 filename=f'bundled-{len(chosen)+1}.{ext}'
                 (folder/filename).write_bytes(raw)
                 chosen.append({'file':filename,'name':filename})

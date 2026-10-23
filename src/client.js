@@ -103,6 +103,7 @@ window.__ModuleLoader__.load({
       apply(ctx) {
         ctx.effect(() => watchSkin(defineSkinHooks));
         ctx.effect(() => watchJournalIntro(window, { manualOnly: true }));
+        ctx.effect(() => watchJournalVideos(window));
         ctx.slots.inject('settings.section', () => ctx.slots.register({
           name: 'settings.section', id: 'diy-journal', order: 10000,
           label: () => 'DIY 手账本'

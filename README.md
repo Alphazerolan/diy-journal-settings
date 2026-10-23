@@ -11,13 +11,21 @@ skin 1.14.3 and its style menu** in one installation. Use **Settings > DIY Journ
 to apply it, adjust layouts and styles in each area, replace images, and combine
 tape, photo borders and captions to make the journal your own.
 
-[Download plugin 1.1.3](https://github.com/Alphazerolan/diy-journal-settings/releases/tag/v1.1.3) ·
+[Download plugin 1.2.0](https://github.com/Alphazerolan/diy-journal-settings/releases/tag/v1.2.0) ·
 [Standalone skin and component gallery](https://github.com/Alphazerolan/diy-journal-skin) ·
 [Changelog](CHANGELOG.md)
 
 This repository upgrades the former standalone editor into a skin-and-editor
 bundle. It edits DIY Journal only, not arbitrary skins. The standalone skin
 remains available for users who only need its appearance.
+
+## Opening animation and animated photos
+
+Use **Enable startup page-turning animation** at the top of the style menu, then **Save and apply**. It is enabled by default and takes effect on the next DSH startup or page reload. Turning it off keeps manual replay available in DSH settings. Reduced-motion preferences skip the animation.
+
+Photo regions support animated GIF and MP4 files (up to 20 MB each). Import MP4 through **Choose image or video**; H.264 is recommended. The menu checks browser playback and captures a poster. Videos retain borders, tape, captions, positioning, rotation, scaling and two-photo stacking, including mixed image/video layouts. Playback is muted and looping; offscreen or reduced-motion playback pauses, and failures leave the poster visible.
+
+Video collages require this integrated plugin. The standalone skin displays posters. Import videos through the menu to generate their posters rather than copying MP4 files directly into folders. The opening-animation switch controls only the startup movie.
 
 ## Skin and DIY features
 
@@ -87,7 +95,7 @@ User messages use blue grid-paper notes. DeepSeek replies use lined paper with a
 Download the `.tgz` from the link above and install it with the standard plugin manager:
 
 ```powershell
-dsh plugin --profile desktop add "C:/Downloads/alphazerolan-dsh-plugin-diy-journal-1.1.3.tgz"
+dsh plugin --profile desktop add "C:/Downloads/alphazerolan-dsh-plugin-diy-journal-1.2.0.tgz"
 ```
 
 Use `web` instead of `desktop` for Web profiles. Fully restart that DSH instance.

@@ -5,12 +5,12 @@ Python 3.9+ standard library only. No automatic seed restoration, no network.
 from pathlib import Path
 import argparse, base64, hashlib, html, json, os, re, shutil, struct, subprocess, sys, tempfile
 import xml.etree.ElementTree as ET
-import styles
+import styles, video_media
 from image_dimensions import image_size
 
 ROOT = Path(__file__).resolve().parents[1]
 MIMES = {'.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.webp':'image/webp',
-         '.gif':'image/gif','.bmp':'image/bmp','.svg':'image/svg+xml'}
+         '.gif':'image/gif','.bmp':'image/bmp','.svg':'image/svg+xml','.mp4':'video/mp4'}
 SEL = 'body:is([data-ds-dark-theme],:not([data-ds-dark-theme])) '
 SETTINGS = SEL+'[data-shortcut-modal="settings"].wCInkW_panel'
 
@@ -48,6 +48,7 @@ def first_picture(directory):
 
 def load_picture(picture):
     if picture.is_symlink():raise ValueError('Please use an image file, not a link: '+str(picture))
+    if picture.suffix.lower()=='.mp4':return video_media.load(picture)
     data=picture.read_bytes();ext=picture.suffix.lower()
     signatures={'.png':data.startswith(b'\x89PNG\r\n\x1a\n'),'.jpg':data.startswith(b'\xff\xd8'),'.jpeg':data.startswith(b'\xff\xd8'),'.webp':data[:4]==b'RIFF' and data[8:12]==b'WEBP','.gif':data[:6] in (b'GIF87a',b'GIF89a'),'.bmp':data[:2]==b'BM'}
     if ext in signatures and not signatures[ext]:raise ValueError('Invalid image header: '+str(picture))
@@ -134,7 +135,7 @@ def build():
     manifest=json.loads((ROOT/'skin.json').read_text(encoding='utf-8'))
     if manifest.get('id')!='diy-journal':raise ValueError('This script only builds the diy-journal skin')
     slots=json.loads((ROOT/'slots.json').read_text(encoding='utf-8'))
-    outputs={};occupied={};report=[];selections={};choices=styles.catalog(ROOT)
+    outputs={};occupied={};report=[];video_slots=[];selections={};choices=styles.catalog(ROOT)
     for s in slots:
         folder=safe_child(ROOT/'DIY图片',s['folder']);folder.mkdir(exist_ok=True)
         key=s['id'];selections[key]=styles.read_choice(ROOT,s,choices)
@@ -152,14 +153,17 @@ def build():
             result=styles.render(ROOT,s,selections[key],selected['uri'],tape_colors,pics[1]['uri'] if len(pics)>1 else None,swap,tape_patterns,adjustments,borders,front)
         else:
             result=f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {s["width"]} {s["height"]}"/>'
+        result=video_media.decorate(result,pics,ROOT)
+        if any(p.get('video') for p in pics):video_slots.append(video_media.entry(s))
         outputs[f'assets/diy-generated/{key}.svg']=result
         if key=='home':
             for i,color in enumerate(tape_colors,1):outputs[f'assets/diy-generated/home-tape-{i}.svg']=styles.home_tape(ROOT,color)
             if selected:
-                w,h=image_size(selected['data'],selected['path'].suffix.lower())
+                w,h=(selected['width'],selected['height']) if selected.get('video') else image_size(selected['data'],selected['path'].suffix.lower())
                 outputs['assets/diy-generated/home-source.svg']=f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{h}" viewBox="0 0 {w} {h}"><image width="100%" height="100%" href="{selected["uri"]}"/></svg>'
             else:outputs['assets/diy-generated/home-source.svg']=result
         report.append({'id':key,'region':s['folder'],'style':selections[key],'tapeColors':tape_colors,'tapePatterns':tape_patterns,'photoAdjustments':adjustments,'photoBorders':borders,'frontPhoto':front,'selected':selected['path'].name if selected else None,'sha256':hashlib.sha256(selected['data']).hexdigest() if selected else None,'photoCanvasSize':[s['width'],s['height']],'collapsed':not bool(selected),'photos':[p['path'].name for p in pics],'swapPhotos':swap})
+    outputs['assets/diy-generated/videos.json']=json.dumps(video_slots,ensure_ascii=False)
     css=rules(slots,occupied,selections)
     outputs['patches.css']=(ROOT/'templates/base.css').read_text(encoding='utf-8')+'\n'+css
     outputs['generated/slots.css']=css
@@ -191,7 +195,7 @@ def install():
     if target.resolve()==ROOT.resolve():return
     if not (target/'skin.json').is_file() or json.loads((target/'skin.json').read_text(encoding='utf-8')).get('id')!='diy-journal':
         raise ValueError('Install the DIY Journal skin first.')
-    allowed=['skin.css','patches.css','hooks.mjs','skin.json','NOTICE','README.md','README.zh.md','LICENSE']
+    allowed=['skin.css','patches.css','hooks.mjs','skin.json','NOTICE','README.md','README.zh.md','LICENSE','intro-settings.json']
     sources=[ROOT/n for n in allowed if (ROOT/n).is_file()]+[p for p in (ROOT/'assets').rglob('*') if p.is_file()]
     for source in sources:
         if source.is_symlink():raise ValueError('Linked files are unsupported')

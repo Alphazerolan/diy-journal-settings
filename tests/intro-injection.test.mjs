@@ -22,6 +22,14 @@ test('only the persisted active journal with a video injects; errors leave boot 
     let callback;
     registerIntroInjection({ on(event, fn) { assert.equal(event, 'webserver/index-inject'); callback = fn; } }, skin);
     const rows = []; callback(rows); assert.equal(rows.length, 1);
+    const settings = join(skin, 'intro-settings.json');
+    writeFileSync(settings, JSON.stringify({ introEnabled: false }));
+    assert.deepEqual(introRows(skin), []);
+    const disabledRows = []; callback(disabledRows); assert.equal(disabledRows.length, 0);
+    writeFileSync(settings, JSON.stringify({ introEnabled: true }));
+    assert.equal(introRows(skin).length, 1);
+    writeFileSync(settings, '{bad'); assert.deepEqual(introRows(skin), []);
+    rmSync(settings);
     writeFileSync(state, JSON.stringify({ active: 'other' }));
     assert.deepEqual(introRows(skin), []);
     writeFileSync(state, '{bad'); assert.deepEqual(introRows(skin), []);

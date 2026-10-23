@@ -2,7 +2,7 @@
 from pathlib import Path
 import base64,json,uuid,os,re,hashlib
 import xml.etree.ElementTree as ET
-import build
+import build, video_media
 
 MAX_IMAGE_BYTES=20*1024*1024
 
@@ -35,26 +35,31 @@ def restore(root,slot,source):
         if not uri:continue
         m=re.fullmatch(r'data:image/(png|jpeg|webp|gif|bmp|svg\+xml);base64,([A-Za-z0-9+/=\s]+)',uri)
         if not m:raise ValueError('皮肤图片不是可恢复的内嵌图片。')
+        video=video_media.recover(skin,el.get('data-diy-video')) if el.get('data-diy-video') else None
         order=el.get('data-diy-photo');parent=el
         while order is None and parent in parents:
             parent=parents[parent];order=parent.get('data-diy-adjustment')
         raw=base64.b64decode(re.sub(r'\s+','',m[2]),validate=True)
         if not raw or len(raw)>MAX_IMAGE_BYTES:raise ValueError('皮肤中的单张图片超过 20 MB 或为空。')
         ext={'jpeg':'jpg','svg+xml':'svg'}.get(m[1],m[1])
-        images.append((int(order) if order else len(images)+1,raw,ext))
+        images.append((int(order) if order else len(images)+1,video['data'] if video else raw,'mp4' if video else ext,video['metadata'] if video else None))
     images.sort(key=lambda x:x[0]);images=images[:1 if slot['id'].endswith('sidebar') else 2]
     folder=build.safe_child(root/'DIY图片',slot['folder']);plain(folder)
     manifest=folder/'图片选择.json';plain(manifest)
     entries=[];created=[]
     try:
-        for i,(_,raw,ext) in enumerate(images):
+        for i,(_,raw,ext,metadata) in enumerate(images):
             filename=f'恢复-{source}-{hashlib.sha256(raw).hexdigest()[:20]}.{ext}'
             target=folder/filename;plain(target)
             if target.exists():
                 if target.read_bytes()!=raw:raise ValueError('已有恢复图片内容不匹配。')
             else:target.write_bytes(raw);created.append(target)
-            build.load_picture(target)
-            w,h=build.image_size(raw,'.'+ext)
+            if metadata:
+                meta=video_media.sidecar(target);plain(meta)
+                if not meta.exists():created.append(meta)
+                meta.write_text(json.dumps(metadata),encoding='utf-8')
+            pic=build.load_picture(target)
+            w,h=(pic['width'],pic['height']) if metadata else build.image_size(raw,'.'+ext)
             if w<=0 or h<=0:raise ValueError('无法识别恢复图片尺寸。')
             entries.append({'file':filename,'name':('皮肤现用' if source=='current' else '鲸鱼娘预设')+f'-{i+1}.{ext}'})
         write_selection(manifest,{'mode':'selected','pictures':(entries+[None,None])[:2]})
@@ -93,7 +98,7 @@ def select(root,slot,payload):
     if type(index) is not int or index not in (0,1) or (index==1 and slot['id'].endswith('sidebar')):raise ValueError('无效照片位置。')
     if not isinstance(name,str) or not name or len(name)>255:raise ValueError('无效图片名称。')
     ext=Path(name).suffix.lower()
-    if ext not in build.MIMES:raise ValueError('请选择 PNG、JPG、WebP、GIF、BMP 或 SVG 图片。')
+    if ext not in build.MIMES:raise ValueError('请选择 PNG、JPG、WebP、GIF、BMP、SVG 图片或 MP4 视频。')
     if not isinstance(encoded,str) or len(encoded)>MAX_IMAGE_BYTES*4//3+4:raise ValueError('单张图片不能超过 20 MB。')
     try:raw=base64.b64decode(encoded,validate=True)
     except ValueError:raise ValueError('图片内容无法读取。')
@@ -106,14 +111,19 @@ def select(root,slot,payload):
     temp=folder/('.import-'+identity+ext);destination=folder/('自选-'+identity+ext)
     try:
         temp.write_bytes(raw)
-        build.load_picture(temp)
-        w,h=build.image_size(raw,ext)
+        if ext=='.mp4':
+            metadata=video_media.validate(raw,payload.get('video'))
+            video_media.sidecar(temp).write_text(json.dumps(metadata),encoding='utf-8')
+        pic=build.load_picture(temp)
+        w,h=(pic['width'],pic['height']) if ext=='.mp4' else build.image_size(raw,ext)
         if w<=0 or h<=0:raise ValueError('无法识别图片尺寸。')
         os.replace(temp,destination)
+        if ext=='.mp4':os.replace(video_media.sidecar(temp),video_media.sidecar(destination))
         entries[index]={'file':destination.name,'name':name}
         write_selection(manifest,{'mode':'selected','pictures':entries})
     except Exception:
         temp.unlink(missing_ok=True);destination.unlink(missing_ok=True)
+        video_media.sidecar(temp).unlink(missing_ok=True);video_media.sidecar(destination).unlink(missing_ok=True)
         raise
     return build.picture_labels(folder)
 

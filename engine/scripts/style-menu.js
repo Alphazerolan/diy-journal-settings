@@ -4,10 +4,10 @@ sessionStorage.setItem('diy-style-token',token);history.replaceState(null,'',loc
 const $=id=>document.getElementById(id),clone=x=>JSON.parse(JSON.stringify(x));
 async function api(path,body){const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),['/api/save','/api/photo','/api/restore-photo'].includes(path)?60000:12000);try{const r=await fetch(path,{method:body===undefined?'GET':'POST',signal:controller.signal,headers:{'X-DIY-Token':token,...(body===undefined?{}:{'Content-Type':'application/json'})},body:body===undefined?undefined:JSON.stringify(body)});if(!r.ok){let e=await r.json();throw Error(e.message)}return r;}catch(e){if(e.name==='AbortError'||e instanceof TypeError){$('retry').hidden=false;throw Error('本地菜单服务未连接。请先点击“重新连接”；仍失败时，请在 DSH 设置 → DIY 手账本中重新打开样式菜单。')}throw e}finally{clearTimeout(timer)}}
 function status(message,error=false){$('status').textContent=message;$('status').classList.toggle('error',error)}
-function dirty(){return !!state.photoDirty||JSON.stringify(state.choices)!==JSON.stringify(state.saved)}
+function dirty(){return JSON.stringify(state.settings)!==JSON.stringify(state.savedSettings)||!!state.photoDirty||JSON.stringify(state.choices)!==JSON.stringify(state.saved)}
 function photoControls(){
  const r=state.regions.find(r=>r.id===state.active),c=state.choices[state.active];
- $('pick-first').textContent=c.style===8?'选择左侧图片':'选择图片';$('pick-second').hidden=c.style!==8;
+ $('pick-first').textContent=c.style===8?'选择左侧图片或视频':'选择图片或视频';$('pick-second').hidden=c.style!==8;
  $('pick-second').disabled=state.busy||!r.photo;
 }
 function setBusy(value){state.busy=value;for(const input of document.querySelectorAll('button,input,select'))input.disabled=value;photoControls();pairControls()}
@@ -20,11 +20,22 @@ async function importPhoto(payload,id=state.active){
   show(id);status('图片已选好并更新预览。点击“保存并应用”后更新皮肤。');
  }catch(e){status(e.message,true)}finally{setBusy(false);nav()}
 }
+async function videoPoster(file){
+ const video=document.createElement('video'),url=URL.createObjectURL(file);video.muted=true;video.playsInline=true;video.preload='auto';
+ try{return await new Promise((resolve,reject)=>{
+  const timer=setTimeout(()=>reject(Error('视频读取超时，请换用 H.264 编码的 MP4。')),15000);
+  video.onerror=()=>{clearTimeout(timer);reject(Error('浏览器无法播放此视频，请换用 H.264 编码的 MP4。'))};
+  video.onloadeddata=()=>{try{const width=video.videoWidth,height=video.videoHeight;if(!width||!height)throw Error('无法读取视频尺寸。');
+   const canvas=document.createElement('canvas'),scale=Math.min(1,960/Math.max(width,height));canvas.width=Math.max(1,Math.round(width*scale));canvas.height=Math.max(1,Math.round(height*scale));canvas.getContext('2d').drawImage(video,0,0,canvas.width,canvas.height);
+   clearTimeout(timer);resolve({width,height,poster:canvas.toDataURL('image/jpeg',.85)});
+  }catch(e){clearTimeout(timer);reject(e)}};video.src=url;
+ })}finally{video.pause();video.removeAttribute('src');video.load();URL.revokeObjectURL(url)}
+}
 $('photo-file').onchange=async e=>{
  const file=e.target.files[0];if(!file)return;
  if(file.size>20*1024*1024){status('单张图片不能超过 20 MB。',true);return}
  const id=state.active,c=state.choices[id],index=c.style===8&&c.swapPhotos?1-state.importIndex:state.importIndex;setBusy(true);
- try{const data=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result.split(',')[1]);r.onerror=()=>reject(Error('无法读取这张图片。'));r.readAsDataURL(file)});await importPhoto({index,name:file.name,data},id)}catch(e){setBusy(false);status(e.message,true)}
+ try{const video=/\.mp4$/i.test(file.name)?await videoPoster(file):undefined;const data=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result.split(',')[1]);r.onerror=()=>reject(Error('无法读取这张图片。'));r.readAsDataURL(file)});await importPhoto({index,name:file.name,data,video},id)}catch(e){setBusy(false);status(e.message,true)}
 };
 $('open-folder').onclick=async()=>{
  setBusy(true);
@@ -116,9 +127,12 @@ function scenePreview(){
  $('live-preview').hidden=false;sceneControls();$('preview-progress').hidden=false;$('preview-progress').textContent='正在生成界面场景…';$('scene-stage').hidden=true;
  const payload={active:state.active,settingsPage:state.scenePage,choices:clone(state.choices),viewport:sceneSize()};
  state.sceneTimer=setTimeout(async()=>{try{const markup=await (await api('/api/scene',payload)).text();if(epoch!==state.sceneEpoch)return;
+  state.sceneVideoCleanup?.();state.sceneVideoCleanup=null;
   const frame=$('scene-frame');frame.onload=()=>{if(epoch!==state.sceneEpoch)return;$('preview-progress').hidden=true;$('scene-stage').hidden=false;fitScene();
    const chat=frame.contentDocument.querySelector('[data-conversation-region="chat"]');
-   if(chat){const s=frame.contentWindow.getComputedStyle(chat,'::before'),w=parseFloat(s.width),h=parseFloat(s.height);if(w>0&&h>0)state.homeCanvasSize=[w,h];}
+   if(chat){const s=frame.contentWindow.getComputedStyle(chat.querySelector('[data-diy-live-slot=home]')||chat,chat.querySelector('[data-diy-live-slot=home]')?null:'::before'),w=parseFloat(s.width),h=parseFloat(s.height);if(w>0&&h>0)state.homeCanvasSize=[w,h];}
+   const config=frame.contentDocument.getElementById('diy-video-config');
+   if(config){const entries=JSON.parse(config.content.textContent),renderer=createJournalVideoRenderer(frame.contentWindow,'/scene-assets/'+token+'/'),stop=renderer.scene(entries);state.sceneVideoCleanup=()=>{stop();renderer.dispose()};}
    syncCanvasPreview();
   };frame.srcdoc=markup;
  }catch(e){if(epoch!==state.sceneEpoch)return;$('preview-progress').textContent='场景生成失败：'+e.message;status(e.message,true)}},160);
@@ -126,13 +140,20 @@ function scenePreview(){
 $('scene-page').onchange=()=>{state.scenePage=$('scene-page').value;scenePreview()};
 $('scene-viewport').onchange=scenePreview;
 $('scene-refresh').onclick=scenePreview;
+function videoPreview(img,text,renderer){
+ const parent=img.parentElement,oldPosition=parent.style.position;parent.style.position='relative';
+ const layer=document.createElement('div');layer.style.cssText='position:absolute;pointer-events:none;overflow:hidden';parent.append(layer);
+ const fit=()=>{layer.style.left=img.offsetLeft+'px';layer.style.top=img.offsetTop+'px';layer.style.width=img.offsetWidth+'px';layer.style.height=img.offsetHeight+'px'};
+ const stop=renderer.mount(layer,text),resize=new ResizeObserver(fit);resize.observe(img);fit();img.style.opacity='0';
+ return ()=>{resize.disconnect();stop();layer.remove();img.style.opacity='';parent.style.position=oldPosition};
+}
 function previewImages(onlySelected=false){
- const epoch=++state.epoch;state.urls.forEach(URL.revokeObjectURL);state.urls=[];scenePreview();
+ const epoch=++state.epoch;state.videoPreviewCleanup?.();state.videoPreviewCleanup=null;const videoRenderer=createJournalVideoRenderer(window,'/scene-assets/'+token+'/'),videoStops=[];state.videoPreviewCleanup=()=>{videoStops.forEach(fn=>fn());videoRenderer.dispose()};state.urls.forEach(URL.revokeObjectURL);state.urls=[];scenePreview();
  const c=clone(state.choices[state.active]),region=state.regions.find(x=>x.id===state.active),groups=new Map();
  for(const img of document.querySelectorAll('.card img'))if(!onlySelected||Number(img.parentElement.dataset.style)===c.style)groups.set(Number(img.parentElement.dataset.style),[img]);
  groups.get(c.style).push($('selected-preview'),$('position-preview'));
  for(const [style,images] of groups){const q=new URLSearchParams({slot:state.active,style,color1:c.tapeColors[0],color2:c.tapeColors[1],pattern1:c.tapePatterns[0],pattern2:c.tapePatterns[1],swap:c.swapPhotos?1:0,adjustments:JSON.stringify(c.photoAdjustments),borders:JSON.stringify(c.photoBorders),front:c.frontPhoto});
-  api('/api/preview?'+q).then(r=>r.blob()).then(async blob=>{if(epoch!==state.epoch)return;const url=URL.createObjectURL(blob);state.urls.push(url);for(const img of images)img.src=url;}).catch(e=>{if(epoch===state.epoch){status(e.message,true);if(style===c.style){$('preview-progress').textContent='预览生成失败：'+e.message;$('preview-progress').hidden=false}}})
+  api('/api/preview?'+q).then(r=>r.blob()).then(async blob=>{if(epoch!==state.epoch)return;const text=await blob.text();if(epoch!==state.epoch)return;const url=URL.createObjectURL(blob);state.urls.push(url);for(const img of images){img.src=url;if(text.includes('data-diy-video='))videoStops.push(videoPreview(img,text,videoRenderer));}}).catch(e=>{if(epoch===state.epoch){status(e.message,true);if(style===c.style){$('preview-progress').textContent='预览生成失败：'+e.message;$('preview-progress').hidden=false}}})
  }
 }
 function pairControls(){
@@ -191,12 +212,13 @@ function show(id){
  photoControls();borderControls();colors();previewImages();
 }
 $('reset').onclick=()=>{for(const r of state.regions)state.choices[r.id].style=1;show(state.active);status('全部区域已选样式 1，胶带纹样与颜色未改变。保存后生效。')};
-$('save').onclick=async()=>{state.busy=true;for(const b of document.querySelectorAll('button,input'))b.disabled=true;status('正在保存布局与胶带设置…');try{const res=await (await api('/api/save',state.choices)).json();if(res.ok||res.saved){state.saved=clone(state.choices);state.photoDirty=false;}status(res.message,!res.ok)}catch(e){status(e.message,true)}finally{state.busy=false;for(const b of document.querySelectorAll('button,input'))b.disabled=false;nav();pairControls();photoControls()}};
-$('close').onclick=async()=>{if(dirty()&&!confirm('还有未保存的选择，确定关闭吗？'))return;try{await api('/api/close',{});state.closed=true;state.saved=clone(state.choices);status('菜单已关闭。再次使用请在 DSH 设置 → DIY 手账本中打开样式菜单。');for(const b of document.querySelectorAll('button,input'))b.disabled=true}catch(e){status(e.message,true)}};
+$('intro-enabled').onchange=()=>{state.settings.introEnabled=$('intro-enabled').checked;status('开场动画设置已暂存，点击“保存并应用”后，下次启动或重新加载 DSH 时生效。')};
+$('save').onclick=async()=>{state.busy=true;for(const b of document.querySelectorAll('button,input'))b.disabled=true;status('正在保存布局与胶带设置…');try{const res=await (await api('/api/save',{choices:state.choices,settings:state.settings})).json();if(res.ok||res.saved){state.saved=clone(state.choices);state.savedSettings=clone(state.settings);state.photoDirty=false;}status(res.message,!res.ok)}catch(e){status(e.message,true)}finally{state.busy=false;for(const b of document.querySelectorAll('button,input'))b.disabled=false;nav();pairControls();photoControls()}};
+$('close').onclick=async()=>{if(dirty()&&!confirm('还有未保存的选择，确定关闭吗？'))return;try{await api('/api/close',{});state.closed=true;state.videoPreviewCleanup?.();state.sceneVideoCleanup?.();state.saved=clone(state.choices);state.savedSettings=clone(state.settings);state.photoDirty=false;status('菜单已关闭。再次使用请在 DSH 设置 → DIY 手账本中打开样式菜单。');for(const b of document.querySelectorAll('button,input'))b.disabled=true}catch(e){status(e.message,true)}};
 window.addEventListener('beforeunload',e=>{if(dirty()){e.preventDefault();e.returnValue=''}});
 async function connect(){try{
  if(state.loaded){await api('/api/ping');$('retry').hidden=true;status('连接已恢复，未保存的选择仍保留。');return}
- $('heading').textContent='正在读取样式…';const data=await (await api('/api/state')).json();state.regions=data.regions;state.styles=data.styles;state.colors=data.colors;state.patterns=data.patterns;
+ $('heading').textContent='正在读取样式…';const data=await (await api('/api/state')).json();state.settings=data.settings||{introEnabled:true};state.savedSettings=clone(state.settings);$('intro-enabled').checked=state.settings.introEnabled;$('intro-enabled').disabled=false;state.regions=data.regions;state.styles=data.styles;state.colors=data.colors;state.patterns=data.patterns;
  state.choices=Object.fromEntries(data.regions.map(r=>[r.id,{style:r.style,tapeColors:[...r.tapeColors],tapePatterns:[...r.tapePatterns],photoAdjustments:clone(r.photoAdjustments),photoBorders:clone(r.photoBorders),swapPhotos:r.swapPhotos||false,frontPhoto:r.frontPhoto||'right'}]));state.saved=clone(state.choices);state.loaded=true;$('save').disabled=false;$('reset').disabled=false;$('retry').hidden=true;status('先选上方布局，再选下方每条胶带的纹样与颜色。');show(state.regions[0].id)
 }catch(e){if(!state.loaded)$('heading').textContent='菜单服务未连接';$('retry').hidden=false;status(e.message,true)}}
 $('retry').onclick=()=>connect().then(()=>{if(state.loaded)previewImages()});

@@ -1,7 +1,7 @@
 """Read-only scene previews using the installed skin CSS and synthetic UI content."""
 import base64, html, json, re
 from urllib.parse import quote
-import build, styles
+import build, styles, video_media
 
 LABELS=['账号与余额','通用设置','模型','内置插件','Agent 预设','已归档会话','Web 插件','皮肤','宠物','创意工坊','使用统计']
 
@@ -33,7 +33,7 @@ def render(root,payload,token,asset_url=None):
     slots=json.loads((root/'slots.json').read_text(encoding='utf-8'));mapping={s['id']:s for s in slots}
     active=payload.get('active');values=payload.get('choices')
     if active not in mapping or not isinstance(values,dict) or set(values)!=set(mapping):raise ValueError('无效预览区域或样式配置')
-    selections={};occupied={};overrides={}
+    selections={};occupied={};overrides={};video_slots=[]
     for s in slots:
         v=values[s['id']]
         if not isinstance(v,dict) or type(v.get('style')) is not int or v['style'] not in {x['id'] for x in styles.available(root,s)}:raise ValueError('无效区域样式')
@@ -51,6 +51,8 @@ def render(root,payload,token,asset_url=None):
         if not occupied[key]:continue
         s=mapping[key];v=values[key];pics=build.pictures(root/'DIY图片'/s['folder'],2 if v['style']==8 else 1)
         svg=styles.render(root,s,v['style'],pics[0]['uri'],v['tapeColors'],pics[1]['uri'] if len(pics)>1 else None,v.get('swapPhotos',False),v.get('tapePatterns',styles.read_patterns(root,s)),v.get('photoAdjustments',styles.read_adjustments(root,s)),v.get('photoBorders',styles.read_borders(root,s)),v.get('frontPhoto',styles.read_front(root,s)))
+        svg=video_media.decorate(svg,pics,root)
+        if any(p.get('video') for p in pics):video_slots.append(dict(video_media.entry(s),svg=svg))
         overrides['assets/diy-generated/'+key+'.svg']=asset_url(svg) if asset_url else 'data:image/svg+xml;base64,'+base64.b64encode(svg.encode()).decode()
     prefix='/scene-assets/'+token+'/'
     def urls(css, dynamic=False):
@@ -70,8 +72,9 @@ def render(root,payload,token,asset_url=None):
     else:
         nav=''.join('<button class="wCInkW_navCell" aria-current="'+str(i==mapping[settings_page]['navIndex']-1).lower()+'"><span class="wCInkW_navLabel">'+label+'</span></button>' for i,label in enumerate(LABELS))
         body='<div class="scene-settings"><section class="wCInkW_panel" data-shortcut-modal="settings"><nav class="wCInkW_nav"><div class="wCInkW_navTitle">设置</div><div class="wCInkW_navList">'+nav+'</div></nav><div class="wCInkW_content"><header class="wCInkW_header"><strong>'+LABELS[mapping[settings_page]['navIndex']-1]+'</strong><button class="wCInkW_close">×</button></header><div class="wCInkW_options"><div data-slot="settings.section">'+content(root,settings_page)+'</div></div></div></section></div>'
+    body+='<template id="diy-video-config">'+html.escape(json.dumps(video_slots,ensure_ascii=False))+'</template>'
     envelope="""
 html,body{width:1200px;height:840px;overflow:hidden;margin:0}*{box-sizing:border-box}body{color:#315e80;font:14px/1.6 'Microsoft YaHei',sans-serif;background:#dceef5}button{font:inherit;color:inherit}a,button,input{pointer-events:none}body>.titlebar{height:32px;display:flex;padding:5px 20px;background:#cceefa}body>.titlebar span{margin-left:auto}.app{display:flex;width:1200px;height:808px}.app>aside{width:270px;flex:none;height:808px}.app>aside>._2H3hWW_root{height:100%;display:flex;flex-direction:column}._2H3hWW_regionArea{flex:1;min-height:0;overflow:hidden}._2H3hWW_footArea{margin-top:auto;flex:none}._2H3hWW_footArea::before{grid-column:1/-1}.app>main{flex:1;min-width:0;display:flex;flex-direction:column}.app>main>.Dc7zOa_header{display:none}[data-conversation-region=chat]{position:relative;flex:1;min-height:0}.Dc7zOa_headerBlank{position:relative;z-index:2}.hero-fixture{position:relative;z-index:2;margin:220px auto 0;max-width:690px;padding:0 20px}.scene-settings{width:1200px;height:840px;display:grid;place-items:center;background:#c1d5dd}.scene-settings .wCInkW_panel{position:relative!important;inset:auto!important;width:1000px!important;height:770px!important;max-width:none!important;max-height:none!important;margin:0!important;display:flex!important}.scene-settings .wCInkW_panel>nav{width:220px!important;flex:none!important;display:flex!important;flex-direction:column!important}.wCInkW_navList{display:flex;flex-direction:column}.wCInkW_navCell{display:flex;flex:none}.scene-settings .wCInkW_content{flex:1;min-width:0;display:flex;flex-direction:column}.scene-settings .wCInkW_header{height:62px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:15px 28px}.scene-settings .wCInkW_options{display:flex;flex-direction:column;flex:1;min-height:0;overflow:auto;padding:18px 30px!important}.scene-settings [data-slot='settings.section']{flex:none}.scene-content{padding:18px;background:var(--sj-paper,#fffcf3);border:1px solid #d5ccb7;border-radius:8px}.scene-content h2{font-size:19px;margin:0 0 10px}.scene-row{display:flex;justify-content:space-between;gap:20px;padding:12px 4px;border-bottom:1px solid #bdced455}.scene-row:last-child{border-bottom:0}.scene-value{color:#64859a}.scene-settings .wCInkW_nav::after{flex-shrink:0}.scene-settings .wCInkW_options::after{flex-shrink:0}
 """
     envelope=envelope.replace('1200px',str(viewport[0])+'px').replace('840px',str(viewport[1])+'px').replace('808px',str(viewport[1]-32)+'px')
-    return '<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width='+str(viewport[0])+'"><meta http-equiv="Content-Security-Policy" content="default-src \'none\'; style-src \'unsafe-inline\'; img-src \'self\' data:; font-src \'self\' data:; form-action \'none\'; base-uri \'none\'"><style>'+css+'\n'+envelope+'</style><body data-dsh-skin-center>'+body+'</body></html>'
+    return '<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width='+str(viewport[0])+'"><meta http-equiv="Content-Security-Policy" content="default-src \'none\'; style-src \'unsafe-inline\'; img-src \'self\' data:; media-src \'self\' blob:; connect-src \'self\'; font-src \'self\' data:; form-action \'none\'; base-uri \'none\'"><style>'+css+'\n'+envelope+'</style><body data-dsh-skin-center>'+body+'</body></html>'

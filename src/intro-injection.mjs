@@ -8,6 +8,8 @@ export function introRows(skinDir) {
   try {
     const state = JSON.parse(readFileSync(join(dirname(dirname(skinDir)), 'skin-center-active.json'), 'utf8'));
     if (state.active !== 'diy-journal' || !existsSync(join(skinDir, 'assets', 'journal-opening-v7.mp4'))) return [];
+    const settingsFile = join(skinDir, 'intro-settings.json');
+    if (existsSync(settingsFile) && JSON.parse(readFileSync(settingsFile, 'utf8')).introEnabled === false) return [];
     return [{ kind: 'script', placement: 'body', text:
       `;(${watchJournalIntro.toString()})(window, { early: true });` }];
   } catch { return []; }
