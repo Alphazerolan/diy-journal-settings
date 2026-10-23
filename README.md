@@ -27,6 +27,14 @@ Photo regions support animated GIF and MP4 files (up to 20 MB each). Import MP4 
 
 Video collages require this integrated plugin. The standalone skin displays posters. Import videos through the menu to generate their posters rather than copying MP4 files directly into folders. The opening-animation switch controls only the startup movie.
 
+### Video collage in the live home screen
+
+This screenshot shows the **actual DSH Web UI with the released 1.2.0 plugin**, including the full sidebar. A page-turning MP4 was imported into the home photo area and plays silently on a loop inside the photo frame, retaining the white border and tape. This demonstrates an imported photo-area video, not the startup overlay. The default artwork remains the Whale-chan illustrations; the screenshot itself is a still image.
+
+![Actual DSH home with an MP4 collage, full sidebar, photo border and tape](docs/images/diy-video-home-v120.png)
+
+**Try it:** Settings → DIY Journal → Open style menu → Choose image or video → Save and apply → Refresh DSH. The menu requires Python 3.9+. Each file is limited to 20 MB; H.264 is recommended for MP4.
+
 ## Skin and DIY features
 
 - **Paper and hand-drawn styling:** handwritten headings, notebook pages and binder rings, tape collages, light/dark palettes, and 14 separately themed ChatGPT-generated Whale-chan illustrations.
@@ -41,15 +49,15 @@ Open the editor from **Settings > DIY Journal**.
 
 ![DIY Journal entry in DSH Settings](docs/images/diy-settings-entry.png)
 
-- **Open folder:** opens the current area's photo directory without changing the selection. Use Choose image to select files added there.
+- **Open folder:** opens the current area's photo directory without changing the selection. Use Choose image or video to select files added there.
 - **Restore current skin photos:** reads the photos currently used in the installed DIY Journal skin for this area and restores them into the editor preview.
 - **Restore Whale-chan presets:** restores the bundled illustrations shown in the gallery for this area.
 
 Both restore actions affect the current area only, retaining existing photo files and layout settings. If No photo is selected, restoring an image enables the single-tape layout so it is visible. **The skin changes only after Save and apply**; refresh DSH afterwards.
 
-The screenshot below shows the running updated editor. The skin scene at its bottom uses static sample content.
+The screenshot below shows the **running 1.2.0 editor**, including the opening-animation switch, image/video picker, folder access and both restore actions. Automatic startup playback is disabled here to demonstrate that photo-area videos work independently; it is enabled by default on a fresh installation. The skin scene at the bottom of the menu uses static sample content.
 
-![Style menu with image selection, folder access, both restore actions and scene preview](docs/images/diy-style-menu.png)
+![1.2.0 editor with startup-animation switch, image/video selection and restore actions](docs/images/diy-style-menu-v120.png)
 
 ## Preview
 
