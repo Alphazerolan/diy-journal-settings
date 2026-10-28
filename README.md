@@ -167,3 +167,7 @@ Code is MIT; asset terms are in [NOTICE](NOTICE) and [skin/NOTICE](skin/NOTICE).
 With DIY Journal active, DSH's early page injections start the five-second opening alongside client plugin loading. It fades out once the live UI is ready; if the video ends first, its last frame remains briefly while loading continues. Timeouts and failures release the normal loading screen. The ordinary client no longer starts a second automatic playback. Skip with the on-screen button or Escape; replay from Settings → DIY Journal. Reduced-motion preferences are respected. Playback is provided by this plugin, not the standalone skin package.
 
 This starts after the host supplies its boot injections, so it cannot cover earlier Electron or host startup. The early-injection version has passed browser checks, and the author has confirmed the startup appearance on their desktop.
+
+### DSH compatibility (1.3.1)
+
+Includes skin 1.14.4. The plugin reads the host version and selects rules for verified 0.2.1-rc.2 / rc.3 releases. Unknown releases retain generic styling and show an unverified notice in settings; this is not a promise of compatibility with future hosts. Personal photos and layouts are preserved. The optional startup page-turn video fades after the UI is ready and falls back on failure. Disable it in the style menu. The asset-only skin does not independently play startup videos.

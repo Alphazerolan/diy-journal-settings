@@ -1,6 +1,6 @@
 {
   "name": "@alphazerolan/dsh-plugin-diy-journal",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "DIY Journal skin and local photo/layout editor in one DeepSeek Harness bundle",
   "type": "module",
   "main": "index.mjs",
@@ -37,7 +37,8 @@
     "NOTICE",
     "LICENSE",
     "!engine/**/__pycache__/**",
-    "!engine/**/*.pyc"
+    "!engine/**/*.pyc",
+    "src/host-version.mjs"
   ],
   "license": "SEE LICENSE IN NOTICE",
   "engines": {

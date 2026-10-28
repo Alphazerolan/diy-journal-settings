@@ -54,14 +54,15 @@ def decorate(svg,pictures,root):
     return ET.tostring(doc,encoding='unicode')
 
 def entry(slot):
+    from dsh_compat import selectors, settings_target
     key=slot['id']
     if key=='home':selector='[data-conversation-region="chat"]';pseudo='before'
     elif key=='main-sidebar':selector='._2H3hWW_root:not(._2H3hWW_collapsed) ._2H3hWW_footArea';pseudo='before'
     elif key=='settings-sidebar':selector='[data-shortcut-modal="settings"].wCInkW_panel>nav';pseudo='after'
     else:
-        selector=f'[data-shortcut-modal="settings"].wCInkW_panel:has(>nav .wCInkW_navCell:nth-child({slot["navIndex"]})[aria-current="true"]) .wCInkW_options'
+        selector='[data-shortcut-modal="settings"].wCInkW_panel'+settings_target(slot)+' .wCInkW_options'
         pseudo='after'
-    return {'id':key,'selector':selector,'pseudo':pseudo,'src':'diy-generated/'+key+'.svg'}
+    return {'id':key,'selector':selectors(selector),'pseudo':pseudo,'src':'diy-generated/'+key+'.svg'}
 
 def recover(skin,ref):
     if not re.fullmatch(r'diy-media/[a-f0-9]{64}\.mp4',ref):raise ValueError('无效的皮肤视频路径。')

@@ -5,7 +5,7 @@ Python 3.9+ standard library only. No automatic seed restoration, no network.
 from pathlib import Path
 import argparse, base64, hashlib, html, json, os, re, shutil, struct, subprocess, sys, tempfile
 import xml.etree.ElementTree as ET
-import styles, video_media
+import styles, video_media, dsh_compat
 from image_dimensions import image_size
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -73,7 +73,7 @@ def rules(slots, occupied, selections=None):
         key=s['id'];show=visibility(occupied[key]);url=f'url("assets/diy-generated/{key}.svg")'
         if not occupied[key]:
             if s['navIndex']:
-                targets=[SETTINGS+f':has(> nav .wCInkW_navCell:nth-child({s["navIndex"]})[aria-current="true"]) .wCInkW_options::after']
+                targets=[SETTINGS+dsh_compat.settings_target(s)+' .wCInkW_options::after']
             elif key=='home':
                 targets=[SEL+'[data-conversation-region="chat"]'+pseudo for pseudo in ('::before','::after')]
             elif key=='settings-sidebar':
@@ -83,7 +83,7 @@ def rules(slots, occupied, selections=None):
             out.append(','.join(targets)+'{content:none!important;display:none!important;width:0!important;height:0!important;min-height:0!important;min-width:0!important;flex:0 0 0!important;aspect-ratio:auto!important;margin:0!important;padding:0!important;border:0!important;background:none!important;box-shadow:none!important;}')
             continue
         if s['navIndex']:
-            selector=SETTINGS+f':has(> nav .wCInkW_navCell:nth-child({s["navIndex"]})[aria-current="true"]) .wCInkW_options::after'
+            selector=SETTINGS+dsh_compat.settings_target(s)+' .wCInkW_options::after'
             margin='auto 0 0' if key in ('account','usage') else '22px 0 4px'
             out.append(selector+'{content:""!important;display:block!important;position:relative!important;inset:auto!important;box-sizing:border-box!important;'
                        f'width:100%!important;max-width:{s["maxWidth"]}px!important;height:auto!important;min-height:0!important;aspect-ratio:{s["width"]}/{s["height"]}!important;'
@@ -128,7 +128,7 @@ def rules(slots, occupied, selections=None):
     out.append('@media(max-width:700px){'+SEL+'.Dc7zOa_headerBlank{min-height:56px!important;}'+SEL+'.Dc7zOa_headerBlank::before{left:12px!important;max-width:calc(100% - 64px)!important;height:52px!important;}}')
     # Preserve the original Explore headline artwork and native Preview badge positioning.
     out.append(SEL+'.Hqq-bq_headline::before{background-image:url("assets/journal-hero-sticker-v86.webp")!important;}')
-    return '\n'.join(out)+'\n'
+    return dsh_compat.selectors('\n'.join(out)+'\n')
 
 
 def build():

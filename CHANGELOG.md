@@ -1,5 +1,13 @@
 # Changelog / 更新记录
 
+## 1.3.1 — 2026-10-28
+
+- 内置皮肤更新为 1.14.4，补充 DSH 0.2.1-rc.3 组件定位，保留旧版选择器。覆盖侧栏、消息、设置、选择菜单、统计和工具面板；样式菜单重新生成布局与视频位置时沿用同一兼容映射。个人图片和布局不重置。
+- Update the bundled skin to 1.14.4 with DSH 0.2.1-rc.3 component selectors while retaining legacy selectors. The editor uses the same compatibility mapping for generated layouts and video anchors. Personal artwork and layouts are preserved.
+
+- 自动识别 DSH 0.2.1-rc.2 / rc.3；插件绘制时按宿主版本适配保留的旧 CSS。未知版本使用通用规则并显示未验证提示。修复蓝色选中笔刷、设置外部阴影，以及 Web 扩展分组后的配图位置。保留可关闭的开屏翻书动画。
+- Detect verified rc.2 / rc.3 host versions and adapt preserved CSS when rendering the plugin edition. Unknown versions retain generic rules with an unverified notice. Restore selection brushes, remove the settings exterior shadow, and follow Web Extensions page identities. Retain the optional startup page-turn animation.
+
 ## 1.3.0 — 2026-10-24
 
 - 增加插件皮肤交接支持：独立描述文件、明确选中后绘制、切换后释放样式与媒体。官方选中信号及卡片注册仍待接入；旧版皮肤中心继续使用原资源皮肤路径。修正插件接管后的图片与字体路径，并让旧式插件皮肤正确让路。详见 [接入状态](docs/DELEGATED-SKIN.md)。

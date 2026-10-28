@@ -15,7 +15,7 @@ export function delegatedJournalCSS(css) {
     });
 }
 
-export function watchDelegatedJournal(win = window) {
+export function watchDelegatedJournal(win = window, adapt = css => css) {
   const doc = win.document;
   const selection = 'data-dsh-delegated-skin';
   const live = 'data-dsh-diy-journal';
@@ -50,7 +50,7 @@ export function watchDelegatedJournal(win = window) {
       const texts = await Promise.all(['stylesheet', 'patches'].map(async part => {
         const response = await win.fetch(endpoint + part, { credentials: 'same-origin', signal: controller.signal, cache: 'no-store' });
         if (!response.ok) throw new Error('Cannot load journal ' + part);
-        return delegatedJournalCSS(await response.text());
+        return adapt(delegatedJournalCSS(await response.text()));
       }));
       if (closed || epoch !== generation || !selected()) return;
       const nodes = texts.map((text, i) => {

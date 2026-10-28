@@ -19,6 +19,7 @@ window.__ModuleLoader__.load({
         };
       }, []);
       const [skin, setSkin] = React.useState(null);
+      const [compatibility, setCompatibility] = React.useState(null);
       const [center, setCenter] = React.useState(null);
       React.useEffect(() => {
         let live = true;
@@ -29,6 +30,7 @@ window.__ModuleLoader__.load({
         ]).then(([status, active]) => {
           if (!live) return;
           setSkin(status.skin); setCenter(active?.ok ? active : false);
+          setCompatibility(status.compatibility);
           if (status.error) setMessage(status.error);
         }).catch(() => { if (live) setMessage('无法读取插件状态，请重新打开设置。'); });
         return () => { live = false; };
@@ -73,7 +75,7 @@ window.__ModuleLoader__.load({
         boxShadow: '0 3px 10px #526c8012', maxWidth: 720
       };
       return h('section', { style: card, 'aria-label': 'DIY 手账本设置', id: 'diy-journal-settings-panel' },
-        h('style', null, ':is(html[data-dsh-skin="diy-journal"],html:has(> body[data-dsh-diy-journal-rendering])) [data-shortcut-modal="settings"]:has(#diy-journal-settings-panel){--cg-settings-section-title:"DIY 手账本"!important;}:is(html[data-dsh-skin="diy-journal"],html:has(> body[data-dsh-diy-journal-rendering])) [data-shortcut-modal="settings"]:has(#diy-journal-settings-panel) .wCInkW_options::after{content:none!important;display:none!important;}'),
+        h('style', null, ':is(html[data-dsh-skin="diy-journal"],html:has(> body[data-dsh-diy-journal-rendering])) [data-shortcut-modal="settings"]:has(#diy-journal-settings-panel){--cg-settings-section-title:"DIY 手账本"!important;}:is(html[data-dsh-skin="diy-journal"],html:has(> body[data-dsh-diy-journal-rendering])) [data-shortcut-modal="settings"]:has(#diy-journal-settings-panel) :is(.wCInkW_options,.AnXs9G_options)::after{content:none!important;display:none!important;}'),
         h('div', { style: {fontSize: 28, fontFamily: 'KaiTi, STKaiti, cursive', marginBottom: 8} }, 'DIY 手账本'),
         h('p', null, '选照片、换胶带，拼出你的手账页面。'),
         h('p', { style: {fontSize: 14} }, skin
@@ -95,6 +97,9 @@ window.__ModuleLoader__.load({
         h('button', { type: 'button', onClick: () => document.dispatchEvent(new Event('diy-journal:replay-intro')),
           style: { marginLeft: 12, padding: '10px 16px', font: 'inherit', color: '#315b73', background: '#fffdf5', border: '1px solid #b7cbd1', borderRadius: 7, cursor: 'pointer' } }, '重播开场动画'),
         h('p', { style: {fontSize: 13, color: '#647f8e'} }, '菜单需要 Python 3.9+，会自动检测。完成后点击“保存并应用”，再刷新 Harness 查看效果。'),
+        compatibility && h('p', { style: {fontSize: 13, color: '#647f8e'} },
+          'DSH ' + (compatibility.version || '版本未识别') + ' · ' +
+          (compatibility.verified ? '已自动匹配兼容规则' : '使用通用兼容样式，此版本尚未验证')),
         h('p', { role: 'status', style: {fontSize: 14} }, message),
         url && h('a', { href: url, target: '_blank', rel: 'noopener noreferrer',
           style: {color: '#237fab', textDecoration: 'underline'} }, '点击进入样式菜单')
@@ -103,7 +108,16 @@ window.__ModuleLoader__.load({
     return {
       inject: ['slots'],
       apply(ctx) {
-        ctx.effect(() => watchDelegatedJournal());
+        ctx.effect(() => {
+          let disposed = false, cleanup;
+          fetch(prefix + '/status', { credentials: 'same-origin', signal: AbortSignal.timeout(3000) })
+            .then(r => r.ok ? r.json() : null).catch(() => null)
+            .then(status => {
+              if (!disposed) cleanup = watchDelegatedJournal(window,
+                css => adaptJournalCSS(css, status?.compatibility?.profile, compatibilityModules));
+            });
+          return () => { disposed = true; cleanup?.(); };
+        });
         ctx.effect(() => watchSkin(defineSkinHooks));
         ctx.effect(() => watchJournalIntro(window, { manualOnly: true }));
         ctx.effect(() => watchJournalVideos(window));

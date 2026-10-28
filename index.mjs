@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { resolve, dirname, join } from 'node:path';
 import { paths, provision, findPython, prepareEditor } from './runtime.mjs';
 import { registerIntroInjection } from './src/intro-injection.mjs';
+import { detectHostCompatibility } from './src/host-version.mjs';
 
 export const name = 'diy-journal-settings';
 export const inject = ['webServer'];
@@ -71,6 +72,7 @@ export function createLauncher(python, skinRoot = root, dshHome = null, skinDir 
 
 export function apply(ctx) {
   const locations = paths();
+  const compatibility = detectHostCompatibility();
   registerIntroInjection(ctx, locations.skin);
   let installation, setupError, launcher, opening, disposed = false;
   try { installation = provision(join(root, 'skin'), locations); }
@@ -98,7 +100,7 @@ export function apply(ctx) {
       ctx.webServer.register({ kind: 'exact', path: prefix + '/status', handler(req, res) {
         if (!localRequest(req)) return reply(res, 403, { error: '仅支持本机访问。' });
         if (req.method !== 'GET') return reply(res, 405, { error: '请求方式错误。' });
-        reply(res, 200, { token, running: launcher?.running() || false, skin: installation,
+        reply(res, 200, { token, running: launcher?.running() || false, skin: installation, compatibility,
           error: setupError || null });
       }}),
       ctx.webServer.register({ kind: 'exact', path: prefix + '/open', async handler(req, res) {
