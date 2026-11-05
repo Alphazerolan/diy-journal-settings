@@ -10,3 +10,16 @@ No user-selected photos, credentials or personal runtime configuration are distr
 代码采用 MIT 授权；随包预设插画由 ChatGPT 生成。
 角色署名、插画仅限个人非商业使用的声明见 skin/NOTICE，插画记录见 skin/ARTWORK.json。
 AI 生成不代表已取得角色授权。字体保留 SIL OFL 授权。不包含个人照片或运行配置。
+
+Artwork and character terms / 插画与角色使用范围
+The bundled Whale-chan illustrations are unofficial fan artwork for personal,
+non-commercial use only. Character and other third-party rights remain with
+their respective holders. The third-party rights holders and permission to
+redistribute the underlying character have not been independently verified.
+Neither DeepSeek nor the DSH skin index endorses this fan work. For the
+reference credits, generation method and individual files see skin/NOTICE
+and skin/ARTWORK.json.
+
+随包鲸鱼娘插画为非官方二创，仅限个人非商业使用。角色及其他第三方权利仍归相应权利人。
+完整权利人身份及角色再分发授权尚未独立核实。DeepSeek 与 DSH 皮肤索引均未为本项目背书。
+署名依据、生成方式及逐图记录见 skin/NOTICE 和 skin/ARTWORK.json。
