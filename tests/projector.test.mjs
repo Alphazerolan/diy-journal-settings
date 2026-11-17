@@ -10,10 +10,15 @@ test('bundled projector can activate twice and releases its observers/listeners'
   } });
   let observers = 0;
   const listeners = new Set();
+  const attributes = new Map();
   globalThis.window = { addEventListener: (_name, fn) => listeners.add(fn),
     removeEventListener: (_name, fn) => listeners.delete(fn) };
   globalThis.document = { documentElement: { getAttribute: () => 'diy-journal', hasAttribute: () => false },
-    body: { hasAttribute: () => false }, querySelectorAll: () => [] };
+    body: { hasAttribute: name => attributes.has(name), getAttribute: name => attributes.get(name) ?? null,
+      setAttribute: (name, value) => attributes.set(name, value), removeAttribute: name => attributes.delete(name) },
+    querySelectorAll: () => [] };
+  window.document = document;
+  window.__DSH_BOOT__ = { release: { version: '0.2.2-rc.1' } };
   globalThis.location = { hash: '', pathname: '/', search: '' };
   globalThis.MutationObserver = class { active = false;
     observe() { this.active = true; observers++; }
@@ -25,6 +30,7 @@ test('bundled projector can activate twice and releases its observers/listeners'
     const callbacks = [];
     const hooks = defineSkinHooks();
     hooks.apply({ onCleanup: fn => callbacks.push(fn) });
+    assert.equal(attributes.get('data-diy-settings-layout'), 'rc1');
     assert.equal(window.__cgStateBooted, true);
     assert.equal(observers, 1); assert.equal(listeners.size, 1);
     // Another activation must not take ownership of the first one's observer.
@@ -35,6 +41,7 @@ test('bundled projector can activate twice and releases its observers/listeners'
     callbacks.forEach(fn => fn());
     callbacks.forEach(fn => fn());
     assert.equal(window.__cgStateBooted, false);
+    assert.equal(attributes.size, 0);
     assert.equal(observers, 0); assert.equal(listeners.size, 0);
   }
 });

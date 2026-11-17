@@ -4,7 +4,9 @@ import { readFileSync } from 'node:fs';
 export function hostCompatibility(version) {
   const value = typeof version === 'string' ? version.trim().replace(/^v/, '') : '';
   const match = /^0\.2\.1-rc\.(2|3)(?:\+[^\s]+)?$/.exec(value);
-  return { version: value || null, profile: match ? 'rc' + match[1] : 'unverified', verified: Boolean(match) };
+  const settingsGrid = /^0\.2\.2-rc\.?(1|3)(?:\+[^\s]+)?$/.test(value);
+  return { version: value || null, profile: settingsGrid ? 'rc3' : match ? 'rc' + match[1] : 'unverified',
+    verified: settingsGrid || Boolean(match) };
 }
 
 export function detectHostCompatibility(resolve = createRequire(import.meta.url).resolve) {

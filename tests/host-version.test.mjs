@@ -8,7 +8,11 @@ const modules = JSON.parse(readFileSync(new URL('../engine/scripts/dsh_rc3_class
 test('only verified host releases select a version adapter', () => {
   assert.equal(hostCompatibility('0.2.1-rc.2').profile, 'rc2');
   assert.equal(hostCompatibility('v0.2.1-rc.3+desktop').profile, 'rc3');
-  for (const version of [null, '0.2.1-rc.30', '0.2.1', '1.0.0', '<script>'])
+  for (const version of ['0.2.2-rc.1', '0.2.2-rc1', 'v0.2.2-rc.3+desktop', '0.2.2-rc3']) {
+    assert.equal(hostCompatibility(version).profile, 'rc3');
+    assert.equal(hostCompatibility(version).verified, true);
+  }
+  for (const version of [null, '0.2.1-rc.30', '0.2.1', '0.2.2-rc.2', '0.2.2-rc.4', '0.2.2', '1.0.0', '<script>'])
     assert.equal(hostCompatibility(version).verified, false);
   assert.equal(detectHostCompatibility(() => { throw Error('absent'); }).profile, 'unverified');
 });

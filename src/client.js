@@ -108,6 +108,7 @@ window.__ModuleLoader__.load({
     return {
       inject: ['slots'],
       apply(ctx) {
+        ctx.effect(() => watchJournalSettingsVersion(window));
         ctx.effect(() => {
           let disposed = false, cleanup;
           fetch(prefix + '/status', { credentials: 'same-origin', signal: AbortSignal.timeout(3000) })

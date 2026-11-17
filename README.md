@@ -7,17 +7,29 @@ components as the developer could think of—from the home screen, sidebars and
 conversation bubbles to menus, cards and tool panels. [See the preview](#preview).
 
 To bring the freedom of a scrapbook to the skin, this plugin bundles **DIY Journal
-skin 1.14.3 and its style menu** in one installation. Use **Settings > DIY Journal**
+skin 1.14.5 and its style menu** in one installation. Use **Settings > DIY Journal**
 to apply it, adjust layouts and styles in each area, replace images, and combine
 tape, photo borders and captions to make the journal your own.
 
-[Download plugin 1.3.0](https://github.com/Alphazerolan/diy-journal-settings/releases/tag/v1.3.0) ·
+[Download plugin 1.3.2](https://github.com/Alphazerolan/diy-journal-settings/releases/tag/v1.3.2) ·
 [Standalone skin and component gallery](https://github.com/Alphazerolan/diy-journal-skin) ·
 [Changelog](CHANGELOG.md)
 
 This repository upgrades the former standalone editor into a skin-and-editor
 bundle. It edits DIY Journal only, not arbitrary skins. The standalone skin
 remains available for users who only need its appearance.
+
+Version 1.3.2 selects the new settings layout from the actual DSH release,
+starting at 0.2.2-rc.1, while earlier or unknown releases retain the legacy branch.
+It restores the settings title and decoration clearance and keeps the sidebar
+photo above the usage note when update indicators appear. Editor preparation
+preserves locally edited sources instead of replacing them with older templates.
+Photos, selections and layouts remain local. The reviewed host releases are
+0.2.1-rc.2, 0.2.1-rc.3, 0.2.2-rc.1 and 0.2.2-rc.3; other versions are not marked
+as verified and still require their own interface checks.
+
+Roster columns and scrollbars now align, and session hover details are distinguished
+from workspace cards so each keeps the correct styling.
 
 ## Opening animation and animated photos
 

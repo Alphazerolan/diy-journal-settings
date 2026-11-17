@@ -107,7 +107,7 @@ def rules(slots, occupied, selections=None):
             # Allocate the footer photo bay only while this folder contains an image.
             out.append(SEL+'._2H3hWW_root:not(._2H3hWW_collapsed) ._2H3hWW_footArea::before{content:""!important;display:block!important;position:relative!important;inset:auto!important;'
                        'box-sizing:border-box;width:calc(100% - 6px)!important;min-width:0!important;max-width:calc(100% - 6px)!important;height:clamp(78px,11vh,120px)!important;min-height:0!important;'
-                       'flex:0 0 auto!important;margin:4px 3px 0!important;align-self:center!important;'+f'background:{url} center/contain no-repeat!important;visibility:{show}!important;'
+                       'flex:0 0 auto!important;margin:4px 3px 0!important;align-self:center!important;grid-column:1/-1!important;grid-row:1!important;justify-self:stretch!important;'+f'background:{url} center/contain no-repeat!important;visibility:{show}!important;'
                        'border:0!important;box-shadow:none!important;transform:none!important;pointer-events:none!important;}')
     # Decorative paper is a paint layer, never a photo slot or a layout spacer.
     # Keep both palettes on disk; only the color palette is used for an empty home folder.

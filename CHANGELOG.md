@@ -1,5 +1,21 @@
 # Changelog / 更新记录
 
+## 1.3.2 — 2026-11-17
+
+- 内置皮肤更新至 1.14.5。按实际 DSH 版本为 0.2.2-rc.1 及以后启用设置页适配，旧版与未识别版本保留旧分支；版本检测独立于已有皮肤增强的运行状态。
+- 修复设置标题、纸飞机和工具栏的布局，并补回内容顶部留白，避免卡片胶带与纸边被裁切。
+- 侧栏照片固定为跨列首行，位于今日消费便签上方；有无新版本提示时保持照片位置与宽度。
+- 修正成员名册的列标题、编号、状态与滚动条对齐，并区分会话悬浮信息与工作区卡片，避免套用错误样式。
+- 编辑器准备改为按先前包文件校验更新，保留已定制的模板、脚本、样式、照片与布局；同步生成模板与脚本，避免重新应用后丢失适配。
+- 保留委托皮肤渲染、已有版本兼容与插件设置页定位；增加版本生命周期和两轮准备、重建、安装回归检查。
+
+- Bundle skin 1.14.5 and select the new settings layout from the actual DSH release, starting at 0.2.2-rc.1. Earlier or unknown releases retain the legacy branch, even when skin enhancements already have an owner.
+- Restore the settings title, paper plane, toolbar sizing and top clearance for raised tape and paper edges.
+- Keep the full-width sidebar photo above the usage note, with stable placement when an update indicator appears.
+- Align roster headings, numbers, status columns and scrollbars, and distinguish session hover details from workspace cards so each keeps the correct styling.
+- Preserve edited editor sources, photos and layouts through three-way preparation; synchronize templates and generation rules so reapplying does not discard compatibility fixes.
+- Retain delegated rendering, existing compatibility adapters and plugin-page targeting; cover version cleanup and two prepare/build/install cycles.
+
 ## 1.3.1 — 2026-10-28
 
 - 内置皮肤更新为 1.14.4，补充 DSH 0.2.1-rc.3 组件定位，保留旧版选择器。覆盖侧栏、消息、设置、选择菜单、统计和工具面板；样式菜单重新生成布局与视频位置时沿用同一兼容映射。个人图片和布局不重置。
